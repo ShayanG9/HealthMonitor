@@ -41,6 +41,7 @@ fun WearApp(greetingName: String) {
          * version of LazyColumn for wear devices with some added features. For more information,
          * see d.android.com/wear/compose.
          */
+        //test
         Column(
             modifier = Modifier
                 .fillMaxSize()
