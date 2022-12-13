@@ -42,6 +42,8 @@ fun WearApp(greetingName: String) {
          * see d.android.com/wear/compose.
          */
         //test
+
+        //Add something.
         Column(
             modifier = Modifier
                 .fillMaxSize()
