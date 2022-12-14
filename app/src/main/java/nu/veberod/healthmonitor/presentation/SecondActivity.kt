@@ -30,6 +30,7 @@ class SecondActivity : ComponentActivity(), SensorEventListener {
         super.onCreate(savedInstanceState)
         initializeSensors()
         setContent {
+            //Call on content
             MainContent2()
         }
     }
