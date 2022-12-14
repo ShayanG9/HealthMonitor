@@ -11,6 +11,7 @@ val Red400 = Color(0xFFCF6679)
 
 val black = Color(0xFF000000)
 val white = Color(0xFFFFFFFF)
+val transparent = Color(0x00FFFFFF)
 
 val primary_darkest = Color(0xFF0A0F0D)
 val primary_dark = Color(0xFF2E443E)
