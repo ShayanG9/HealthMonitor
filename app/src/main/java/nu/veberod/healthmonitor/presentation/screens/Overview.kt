@@ -98,14 +98,14 @@ fun Overview(navController: NavController) {
             onClick = {
                 navController.navigate(Screen.Settings.route)
             },
-            colors = ButtonDefaults.buttonColors(backgroundColor = grays),
+            colors = ButtonDefaults.buttonColors(backgroundColor = grays_darker),
             modifier = Modifier
                 .align(Alignment.End)
         ) {
             Image(
                 imageVector = Icons.Rounded.Settings,
                 contentDescription = "",
-                colorFilter = ColorFilter.tint(grays_darkest)
+                colorFilter = ColorFilter.tint(grays_lightest)
             )
         }
     }

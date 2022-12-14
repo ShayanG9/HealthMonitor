@@ -35,7 +35,7 @@ fun Settings(navController: NavController) {
             onClick = {
                 navController.navigate(Screen.Settings.route)
             },
-            colors = ButtonDefaults.buttonColors(backgroundColor = grays),
+            colors = ButtonDefaults.buttonColors(backgroundColor = grays_darker),
             modifier = Modifier
                 .fillMaxWidth()
         ) {
@@ -48,7 +48,7 @@ fun Settings(navController: NavController) {
             onClick = {
                 navController.navigate(Screen.Settings.route)
             },
-            colors = ButtonDefaults.buttonColors(backgroundColor = grays),
+            colors = ButtonDefaults.buttonColors(backgroundColor = grays_darker),
             modifier = Modifier
                 .fillMaxWidth()
         ) {
@@ -61,7 +61,7 @@ fun Settings(navController: NavController) {
             onClick = {
                 navController.navigate(Screen.Settings.route)
             },
-            colors = ButtonDefaults.buttonColors(backgroundColor = grays),
+            colors = ButtonDefaults.buttonColors(backgroundColor = grays_darker),
             modifier = Modifier
                 .fillMaxWidth()
         ) {
@@ -74,15 +74,10 @@ fun Settings(navController: NavController) {
             onClick = {
                 navController.navigate(Screen.Overview.route)
             },
-            colors = ButtonDefaults.buttonColors(backgroundColor = grays),
+            colors = ButtonDefaults.buttonColors(backgroundColor = accent_dark),
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-//            Icon(
-//                imageVector = Icons.Rounded.ArrowBack,
-//                contentDescription = ""
-//            )
-//            Spacer(modifier = Modifier.width(16.dp))
             Text(text = "Back")
         }
 
