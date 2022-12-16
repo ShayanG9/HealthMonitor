@@ -3,93 +3,101 @@ package nu.veberod.healthmonitor.presentation.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Face
-import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.*
 import androidx.navigation.NavController
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Text
+import nu.veberod.healthmonitor.R
 import nu.veberod.healthmonitor.presentation.Screen
 import nu.veberod.healthmonitor.presentation.theme.*
 
 @Composable
 fun Overview(navController: NavController) {
 
+    var heartrate : Int = 110
+    var distance : Double = 3.5
+    var calories : Int = 349
+
     Column (
         verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 50.dp)
+            .padding(horizontal = 50.dp, vertical = 20.dp)
     ) {
-        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(text = "Overview", fontWeight = FontWeight.Bold)
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         // ----------
         // HEARTRATE
         // ----------
 
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
         ) {
             Image(
-                imageVector = Icons.Rounded.Favorite,
+                painterResource(id = R.drawable.heartcircle),
                 contentDescription = "",
-                colorFilter = ColorFilter.tint(primary)
+                modifier = Modifier.size(24.dp)
             )
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Text(text = "Heartrate")
+            Text(text = "$heartrate bpm", fontWeight = FontWeight.Bold)
         }
         
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         // ----------
         // SOME OTHER INFO
         // ----------
 
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
         ) {
             Image(
-                imageVector = Icons.Rounded.Face,
+                painterResource(id = R.drawable.pointer),
                 contentDescription = "",
-                colorFilter = ColorFilter.tint(primary)
+                modifier = Modifier.size(24.dp)
             )
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Text(text = "Mood")
+            Text(text = "$distance km", fontWeight = FontWeight.Bold)
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         // ----------
         // SOME OTHER INFO
         // ----------
 
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
         ) {
             Image(
-                imageVector = Icons.Rounded.Info,
+                painterResource(id = R.drawable.flashcircle),
                 contentDescription = "",
-                colorFilter = ColorFilter.tint(primary)
+                modifier = Modifier.size(24.dp)
             )
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Text(text = "TBA")
+            Text(text = "$calories kcals", fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -98,14 +106,14 @@ fun Overview(navController: NavController) {
             onClick = {
                 navController.navigate(Screen.Settings.route)
             },
-            colors = ButtonDefaults.buttonColors(backgroundColor = grays_darker),
+            colors = ButtonDefaults.buttonColors(backgroundColor = transparent),
             modifier = Modifier
-                .align(Alignment.End)
+                .align(Alignment.CenterHorizontally)
         ) {
             Image(
-                imageVector = Icons.Rounded.Settings,
+                painterResource(id = R.drawable.settings),
                 contentDescription = "",
-                colorFilter = ColorFilter.tint(grays_lightest)
+                modifier = Modifier.size(20.dp)
             )
         }
     }
