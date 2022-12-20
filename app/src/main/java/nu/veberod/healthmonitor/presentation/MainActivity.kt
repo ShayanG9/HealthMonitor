@@ -1,6 +1,7 @@
 
 package nu.veberod.healthmonitor.presentation
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 
 import androidx.compose.foundation.background
+
+
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -35,10 +40,13 @@ class MainActivity : ComponentActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        val intent = Intent(this, MyService::class.java)
+        startService(intent)
+        
         setContent {
             WearApp()
         }
-
     }
 
 }
@@ -52,6 +60,7 @@ class MainActivity : ComponentActivity(){
 fun WearApp() {
 
     HealthMonitorTheme {
+
 
         val pagerState = rememberPagerState()
 
@@ -128,6 +137,7 @@ fun HeatMapTab(){
 }
 
 @Composable
+
 fun HeatMap(modifier: Modifier){
     AndroidView(factory = {context -> LayoutInflater.from(context).inflate(R.layout.heatmap, null).apply{
         setHeatMap(view = this)
@@ -148,6 +158,7 @@ fun setHeatMap(view: View){
     view.setOnClickListener {
         //TODO: FullScreen the HeatMap
     }
+
 }
 
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
