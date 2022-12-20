@@ -47,7 +47,12 @@ var minYValue: Float = 0.0F
 var maxYValue: Float = 0.0F
 var sensor = "Puls"
 var unitX = "s"
-// random get numbers
+
+
+
+
+
+// random get numbers dummy test
 fun getNum(){
 
 
