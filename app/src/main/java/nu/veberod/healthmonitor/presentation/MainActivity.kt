@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -31,6 +32,7 @@ import java.util.*
 
 class MainActivity : ComponentActivity(){
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -40,6 +42,7 @@ class MainActivity : ComponentActivity(){
     }
 
 }
+
 
 
 
