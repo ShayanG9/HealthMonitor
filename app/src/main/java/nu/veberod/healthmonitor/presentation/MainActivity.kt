@@ -56,6 +56,7 @@ fun WearApp() {
         val pagerState = rememberPagerState()
 
         val pageIndicatorState: PageIndicatorState = remember {
+
             object : PageIndicatorState {
                 override val pageOffset: Float
                     get() = pagerState.currentPageOffset *-1
@@ -64,6 +65,7 @@ fun WearApp() {
                 override val pageCount: Int
                     get() = pagerState.pageCount
             }
+
         }
 
         VerticalPager(count = 3, state= pagerState) { page ->
@@ -71,7 +73,7 @@ fun WearApp() {
 
 
             when(page){
-                0-> null //TODO: Add Overview Page
+                0-> Navigation()
 
                 1-> null //TODO: Add Graph Page
 
