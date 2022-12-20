@@ -23,13 +23,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
-import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import nu.veberod.healthmonitor.R
 import nu.veberod.healthmonitor.presentation.theme.HealthMonitorTheme
-
 
 class MainActivity : ComponentActivity(){
 
@@ -38,6 +35,9 @@ class MainActivity : ComponentActivity(){
         setContent {
             Button()
         }
+        //Start the service
+        val intent = Intent(this, MyService::class.java)
+        startService(intent)
     }
 }
 
@@ -70,12 +70,6 @@ fun Button()
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        Button(onClick = {
-            mContext.startActivity(Intent(mContext, SecondActivity::class.java))
-        },
-        ) {
-            Text(text = "Navigate", fontSize = 18.sp)
-        }
 
     }
 
