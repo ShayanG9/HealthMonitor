@@ -1,13 +1,10 @@
 package nu.veberod.healthmonitor.presentation.graphs
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 
 
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,18 +20,7 @@ import kotlin.random.Random
 
 
 
-class MainActivity : ComponentActivity() {
 
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            getNum()
-        ChartWithLabels()
-        }
-
-}}
 
 data class Point(val x: Float, val y: Float)
 
