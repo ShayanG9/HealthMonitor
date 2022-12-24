@@ -28,6 +28,7 @@ import ca.hss.heatmaplib.HeatMap
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.VerticalPager
 import com.google.accompanist.pager.rememberPagerState
+import com.google.firebase.FirebaseApp
 import nu.veberod.healthmonitor.R
 import nu.veberod.healthmonitor.presentation.theme.HealthMonitorTheme
 import java.util.*
@@ -43,7 +44,8 @@ class MainActivity : ComponentActivity(){
         
         val intent = Intent(this, MyService::class.java)
         startService(intent)
-        
+        FirebaseApp.initializeApp(this)
+        Database.sendData("1")
         setContent {
             WearApp()
         }
