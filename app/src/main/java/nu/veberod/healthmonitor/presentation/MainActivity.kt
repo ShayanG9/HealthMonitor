@@ -29,6 +29,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.VerticalPager
 import com.google.accompanist.pager.rememberPagerState
 import nu.veberod.healthmonitor.R
+import nu.veberod.healthmonitor.presentation.graphs.ChartWithLabels
 import nu.veberod.healthmonitor.presentation.theme.HealthMonitorTheme
 import java.util.*
 
@@ -84,7 +85,7 @@ fun WearApp() {
             when(page){
                 0-> Navigation()
 
-                1-> null //TODO: Add Graph Page
+                1-> ChartWithLabels()
 
                 2->HeatMapTab()
             }
