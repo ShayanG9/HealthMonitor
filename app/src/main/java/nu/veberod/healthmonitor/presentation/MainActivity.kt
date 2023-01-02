@@ -30,6 +30,7 @@ import com.google.maps.android.compose.*
 import com.google.maps.android.heatmaps.HeatmapTileProvider
 import nu.veberod.healthmonitor.R
 import nu.veberod.healthmonitor.presentation.screens.HeatMap
+import nu.veberod.healthmonitor.presentation.screens.HeatMapTab
 import nu.veberod.healthmonitor.presentation.theme.HealthMonitorTheme
 import kotlin.collections.ArrayList
 
@@ -103,6 +104,7 @@ fun Pager(isVisible: Boolean, setVisibility: (Boolean) -> Unit){
         }
 
     }
+
     if(isVisible) {
         HorizontalPageIndicator(
             modifier = Modifier
@@ -114,88 +116,6 @@ fun Pager(isVisible: Boolean, setVisibility: (Boolean) -> Unit){
 }
 
 
-@Composable
-fun HeatMapTab(setVisibility: (Boolean) -> Unit){
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "preview"){
-
-        composable("preview"){
-            setVisibility(true)
-            HeatMapPreview(navController)
-        }
-        composable("fullscreen"){
-            setVisibility(false)
-            HeatMap(navController)
-        }
-    }
-
-
-
-}
-
-@Composable
-fun HeatMapPreview(navCon : NavController){
-    val titlePadding = 30.dp
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.background),
-        verticalArrangement = Arrangement.Top
-
-
-    ) {
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = titlePadding, bottom = 0.dp),
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.primary,
-            text = stringResource(R.string.heatmap_title)
-
-        )
-
-        val veberod = LatLng(55.634944, 13.500889)
-        val cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(veberod, 11.8f)
-        }
-
-
-
-        GoogleMap(
-            modifier = Modifier
-                .width(167.dp)
-                .height(122.dp)
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 5.dp),
-            uiSettings = MapUiSettings(zoomControlsEnabled = false,scrollGesturesEnabled = false, zoomGesturesEnabled = false),
-            properties = MapProperties(mapType = MapType.HYBRID),
-            cameraPositionState = cameraPositionState,
-            onMapClick = {
-                navCon.navigate("fullscreen")
-            }
-        ){
-            HeatMapTile()
-        }
-
-        /*HeatMap(modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 0.dp))*/
-
-
-
-
-    }
-
-}
-@Composable
-fun HeatMapTile(){
-
-    val latLngs :MutableList<LatLng> = ArrayList()
-    latLngs.add(LatLng(55.634944, 13.500889))
-    val prov = HeatmapTileProvider.Builder().data(latLngs).build()
-    TileOverlay(tileProvider = prov)
-}
 
 
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)

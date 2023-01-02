@@ -77,8 +77,6 @@ dependencies {
     // If using indicators, also depend on
     implementation "com.google.accompanist:accompanist-pager-indicators:0.19.0"
 
-    implementation 'ca.heartlandsoftware:androidheatmap:1.2.0'
-
     //Google Maps Utility Used for HeatMap
     implementation 'com.google.maps.android:maps-utils-ktx:3.4.0'
 
