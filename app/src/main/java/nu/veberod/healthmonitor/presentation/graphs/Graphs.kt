@@ -60,6 +60,7 @@ fun getNum(){
 @Preview("graphs")
 @Composable
 fun ChartWithLabels() {
+    getNum()
     Column(
         Modifier
             .background(Color.Black)
@@ -77,15 +78,15 @@ fun ChartWithLabels() {
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = maxYValue.roundToInt().toString(),color = Color.Green)
+                Text(text = maxYValue.roundToInt().toString(),color = Color.White)
                 //Text(text = minYValue.roundToInt().toString(),color = Color.Green)
             }
             LineChart()
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(minXValue.roundToInt().toString(),color = Color.Green)
+            Text(minXValue.roundToInt().toString(),color = Color.White)
             Text(sensor,color = Color.Gray)
-            Text(maxXValue.roundToInt().toString()+unitX,color = Color.Green)
+            Text(maxXValue.roundToInt().toString()+unitX,color = Color.White)
 
         }
     }
@@ -141,7 +142,7 @@ fun LineChart(modifier: Modifier = Modifier.size(110.dp, 110.dp).fillMaxWidth())
             // and finally we draw the path
             drawPath(
                 path,
-                color = Color.Blue,
+                color = Color.Red,
                 style = Stroke(width = 3f))
 
         })
