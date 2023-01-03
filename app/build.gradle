@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
     id 'com.google.gms.google-services'
 }
 
@@ -45,7 +46,9 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+
 }
+
 
 dependencies {
     implementation 'androidx.core:core-ktx:1.7.0'
@@ -63,26 +66,31 @@ dependencies {
     implementation 'androidx.compose.material:material-icons-core:1.1.1'
     implementation "androidx.navigation:navigation-compose:$rootProject.composeNavigationVersion"
     implementation 'com.google.android.material:material:1.7.0'
+    implementation 'com.google.firebase:firebase-database-ktx:20.1.0'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
+    //Firestore
+    implementation platform('com.google.firebase:firebase-bom:31.0.2')
+    implementation 'com.google.firebase:firebase-firestore-ktx'
 
     implementation "androidx.wear.compose:compose-navigation:$wear_compose_version"
 
-    implementation "com.google.accompanist:accompanist-pager:0.19.0"
+    implementation "com.google.accompanist:accompanist-pager:0.28.0"
 
     // If using indicators, also depend on
     implementation "com.google.accompanist:accompanist-pager-indicators:0.19.0"
 
-    implementation 'ca.heartlandsoftware:androidheatmap:1.2.0'
+    //Google Maps Utility Used for HeatMap
+    implementation 'com.google.maps.android:maps-utils-ktx:3.4.0'
 
-    // Import the BoM for the Firebase platform
-    implementation platform('com.google.firebase:firebase-bom:31.1.1')
+    implementation 'com.google.maps.android:maps-compose:2.8.0'
+    implementation 'com.google.android.gms:play-services-maps:18.1.0'
 
-    // Add the dependency for the Realtime Database library
-    // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation 'com.google.firebase:firebase-database'
+
+    implementation "com.google.accompanist:accompanist-themeadapter-appcompat:0.28.0"
+
 
 
 

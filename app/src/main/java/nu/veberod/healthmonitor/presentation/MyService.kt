@@ -19,11 +19,12 @@ class MyService : Service(){
     private lateinit var accelerometer: Sensor
     private lateinit var heartRate: Sensor;     private lateinit var stepCounter: Sensor
     private lateinit var gyroScope: Sensor;     private lateinit var sensorName: String
+    private lateinit var ecg: Sensor
     private var sensorData: MutableList<Float> = mutableListOf<Float>()
 
     @SuppressLint("SimpleDateFormat")
-    private val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
-    private val currentDate = sdf.format(Date())
+    private val sdf = SimpleDateFormat("MM-dd-yyyy HH:mm:ss")
+    var currentDate: String = sdf.format(Date())
     //Thread variables
     private var serviceLooper: Looper? = null
     private var serviceHandler: ServiceHandler? = null
@@ -61,6 +62,9 @@ class MyService : Service(){
 
         fun initializeSensors()
         {
+            /** ----------------DEBUGGING---------------- */
+            println("Current thread " + Thread.currentThread().name)
+            /** ----------------DEBUGGING---------------- */
             // Get a reference to the SensorManager
             sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
@@ -70,6 +74,9 @@ class MyService : Service(){
             for (sensor in sensorList) {
                 //Print out the availabe senors
                 println(sensor)
+                if (sensor.type == 69669) {
+                    ecg = sensor
+                }
                 if (sensor.type == Sensor.TYPE_GYROSCOPE) {
                     gyroScope = sensor
                 }
@@ -88,20 +95,20 @@ class MyService : Service(){
 
         fun registerListener(){
             // Register the SensorEventListener to receive updates from the sensors
-            sensorManager.registerListener(this, gyroScope, 100000, serviceHandler)
-            sensorManager.registerListener(this, accelerometer, 100000, serviceHandler)
-            sensorManager.registerListener(this, heartRate, 500000, serviceHandler)
-            sensorManager.registerListener(this, stepCounter, 5000000, serviceHandler)
+            sensorManager.registerListener(this, gyroScope, 5000000, serviceHandler)
+            sensorManager.registerListener(this, accelerometer, 5000000, serviceHandler)
+            sensorManager.registerListener(this, heartRate, 5000000, serviceHandler)
+            sensorManager.registerListener(this, stepCounter, 50000000, serviceHandler)
 
         }
 
         override fun onSensorChanged(p0: SensorEvent?) {
-
             /** |----Name of the sensors----|
              * - LSM6DSO Accelerometer
              * - LSM6DSO Gyroscope
              * - Samsung HR Batch Sensor
              * - Samsung Step Counter
+             * - AFE4500S ECG
              */
 
             // Get the name of the current sensor.
@@ -114,24 +121,24 @@ class MyService : Service(){
                 sensorData.add(p0!!.values[0])
                 sensorData.add(p0.values[1])
                 sensorData.add(p0.values[2])
-                saveSensorDataFirebase("Accelerometer", sensorData)
+                saveSensorDataFirebase("Acc", sensorData)
             }
             else if ("LSM6DSO Gyroscope" in sensorName)
             {
                 sensorData.add(p0!!.values[0])
                 sensorData.add(p0.values[1])
                 sensorData.add(p0.values[2])
-                saveSensorDataFirebase("Gyroscope", sensorData)
+                saveSensorDataFirebase("Gyro", sensorData)
             }
             else if ("Samsung HR Batch Sensor" in sensorName)
             {
                 sensorData.add(p0!!.values[0])
-                saveSensorDataFirebase("Heart Rate", sensorData)
+                saveSensorDataFirebase("Heart", sensorData)
             }
             else if ("Samsung Step Counter" in sensorName)
             {
                 sensorData.add(p0!!.values[0])
-                saveSensorDataFirebase("Step Counter", sensorData)
+                saveSensorDataFirebase("Step", sensorData)
             }
 
         }
@@ -141,7 +148,10 @@ class MyService : Service(){
 
         fun saveSensorDataFirebase(name: String, data: MutableList<Float>)
         {
-            println(name)
+            currentDate = sdf.format(Date())
+            //Sends the data to a database.
+            Database.sendData(name, data, currentDate)
+
             //Clear the data.
             sensorData.clear()
         }

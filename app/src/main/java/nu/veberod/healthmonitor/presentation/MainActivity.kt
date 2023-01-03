@@ -4,9 +4,12 @@ package nu.veberod.healthmonitor.presentation
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.*
@@ -28,10 +31,7 @@ import androidx.wear.compose.material.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.VerticalPager
 import com.google.accompanist.pager.rememberPagerState
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.*
-import com.google.maps.android.heatmaps.HeatmapTileProvider
+import com.google.firebase.database.FirebaseDatabase
 import nu.veberod.healthmonitor.R
 import nu.veberod.healthmonitor.presentation.screens.HeatMap
 import nu.veberod.healthmonitor.presentation.screens.HeatMapTab
@@ -48,15 +48,16 @@ class MainActivity :  ComponentActivity(){
 
         //Permission for the sensors.
         setPermission()
-        
+
+        //Start service
         val intent = Intent(this, MyService::class.java)
         startService(intent)
-
 
         setContent {
             WearApp()
         }
     }
+
 
     private fun setPermission(){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION)
@@ -114,7 +115,7 @@ fun Pager(isVisible: Boolean, setVisibility: (Boolean) -> Unit){
 
     }
 
-    VerticalPager(count = 3, state= pagerState, userScrollEnabled = isVisible) { page ->
+    VerticalPager(count = 3, state= pagerState) { page ->
         // Our page content
 
 
