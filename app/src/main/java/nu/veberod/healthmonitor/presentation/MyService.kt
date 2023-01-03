@@ -16,10 +16,10 @@ class MyService : Service(){
 
     //Sensor variables
     private lateinit var sensorManager: SensorManager
-    private lateinit var accelerometer: Sensor; private lateinit var heartBeat: Sensor;
+    private lateinit var accelerometer: Sensor
     private lateinit var heartRate: Sensor;     private lateinit var stepCounter: Sensor
     private lateinit var gyroScope: Sensor;     private lateinit var sensorName: String
-    private var SensorData: MutableList<Float> = mutableListOf<Float>()
+    private var sensorData: MutableList<Float> = mutableListOf<Float>()
 
     @SuppressLint("SimpleDateFormat")
     private val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
@@ -66,93 +66,84 @@ class MyService : Service(){
 
             // Get a list of available sensors
             val sensorList = sensorManager.getSensorList(Sensor.TYPE_ALL)
-
             // Find the available sensors
             for (sensor in sensorList) {
-                //Test Gyro and Acc
+                //Print out the availabe senors
+                println(sensor)
                 if (sensor.type == Sensor.TYPE_GYROSCOPE) {
                     gyroScope = sensor
                 }
                 if (sensor.type == Sensor.TYPE_ACCELEROMETER) {
                     accelerometer = sensor
                 }
-                /** --UNCOMMENT IF USING SMARTWATCH--
-                if (sensor.type == Sensor.TYPE_HEART_BEAT) {
-                heartBeat = sensor
-                }
                 if (sensor.type == Sensor.TYPE_HEART_RATE) {
-                heartRate = sensor
+                    heartRate = sensor
                 }
                 if (sensor.type == Sensor.TYPE_STEP_COUNTER) {
-                stepCounter = sensor
+                    stepCounter = sensor
                 }
-                 */
             }
             registerListener()
         }
 
         fun registerListener(){
             // Register the SensorEventListener to receive updates from the sensors
-            sensorManager.registerListener(this, gyroScope, SensorManager.SENSOR_DELAY_NORMAL, serviceHandler)
-            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL, serviceHandler)
-            /** --UNCOMMENT IF USING SMARTWATCH--
-             * sensorManager.registerListener(this, heartBeat, SensorManager.SENSOR_DELAY_NORMAL, serviceHandler)
-             * sensorManager.registerListener(this, heartRate, SensorManager.SENSOR_DELAY_NORMAL, serviceHandler)
-             * sensorManager.registerListener(this, stepCounter, SensorManager.SENSOR_DELAY_NORMAL, serviceHandler)
-             */
+            sensorManager.registerListener(this, gyroScope, 100000, serviceHandler)
+            sensorManager.registerListener(this, accelerometer, 100000, serviceHandler)
+            sensorManager.registerListener(this, heartRate, 500000, serviceHandler)
+            sensorManager.registerListener(this, stepCounter, 5000000, serviceHandler)
 
         }
 
         override fun onSensorChanged(p0: SensorEvent?) {
-            /** ----------------DEBUGGING----------------
-             * println("Current thread " + Thread.currentThread().name)
-             * ----------------DEBUGGING---------------- */
 
+            /** |----Name of the sensors----|
+             * - LSM6DSO Accelerometer
+             * - LSM6DSO Gyroscope
+             * - Samsung HR Batch Sensor
+             * - Samsung Step Counter
+             */
+
+            // Get the name of the current sensor.
             if (p0 != null) {
                 sensorName = p0.sensor.name
             }
 
-            if ("Accelerometer" in sensorName)
+            if ("LSM6DSO Accelerometer" in sensorName)
             {
-                SensorData.add(p0!!.values[0])
-                SensorData.add(p0.values[1])
-                SensorData.add(p0.values[2])
-                saveSensorData("accelerometer", SensorData)
+                sensorData.add(p0!!.values[0])
+                sensorData.add(p0.values[1])
+                sensorData.add(p0.values[2])
+                saveSensorDataFirebase("Accelerometer", sensorData)
             }
-            else if ("Gyroscope" in sensorName)
+            else if ("LSM6DSO Gyroscope" in sensorName)
             {
-                SensorData.add(p0!!.values[0])
-                SensorData.add(p0.values[1])
-                SensorData.add(p0.values[2])
-                saveSensorData("gyroscope", SensorData)
+                sensorData.add(p0!!.values[0])
+                sensorData.add(p0.values[1])
+                sensorData.add(p0.values[2])
+                saveSensorDataFirebase("Gyroscope", sensorData)
             }
-            /** UNCOMMENT IF ON SMARTWATCH
-            else if ("Heart Beat" in sensorName)
+            else if ("Samsung HR Batch Sensor" in sensorName)
             {
-            println(sensorName)
+                sensorData.add(p0!!.values[0])
+                saveSensorDataFirebase("Heart Rate", sensorData)
             }
-            else if ("Heart Rate" in sensorName)
+            else if ("Samsung Step Counter" in sensorName)
             {
-            println(sensorName)
+                sensorData.add(p0!!.values[0])
+                saveSensorDataFirebase("Step Counter", sensorData)
             }
-            else if ("Step Counter" in sensorName)
-            {
-            println(sensorName)
-            }
-             */
+
         }
 
         override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
         }
 
-        fun saveSensorData(name: String, data: MutableList<Float>)
+        fun saveSensorDataFirebase(name: String, data: MutableList<Float>)
         {
-            println(name + " x: " + data[0] + " y: " + data[1] + " z: " + data[2] + " " + currentDate)
-            /**
-             * Save the data in a text file.
-             */
+            println(name)
             //Clear the data.
-            SensorData.clear()
+            sensorData.clear()
         }
 
     }
