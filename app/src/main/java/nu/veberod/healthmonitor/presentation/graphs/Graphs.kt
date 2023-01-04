@@ -5,20 +5,29 @@ import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.composable
+import nu.veberod.healthmonitor.presentation.screens.HeatMapPreview
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -45,12 +54,23 @@ var unitX = "s"
 // random get numbers dummy test
 fun getNum(){
 
-
-    for (i in 1..100){
-        values.add(Point(i-1f, Random.nextFloat()*100))
-    }
-
+    /* For dummy values
+    //for (i in 1..100){
+      //  values.add(Point(i-1f, Random.nextFloat()*100))
+   // }
+    //Random.nextFloat()*100
     // find max and min value of X, we will need that later
+    */
+
+    /* Hi I tried to populate the values<point> list from the sensor
+    reading event (MyService.kt) and it worked on the simulator, updates values in graph
+
+    something like this in the "heart rate" reading
+    values.add(Point(values.size.toFloat(), "Whatever value heart rate is from".toFloat()))
+
+
+     */
+
     minXValue = values.minOf { it.x }
     maxXValue = values.maxOf { it.x }
     // find max and min value of Y, we will need that later
@@ -83,6 +103,7 @@ fun ChartWithLabels() {
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(text = maxYValue.roundToInt().toString(),color = Color.White)
+                Text(text = minYValue.roundToInt().toString(),color = Color.White)
             }
             LineChart()
         }
@@ -93,6 +114,8 @@ fun ChartWithLabels() {
 
         }
     }
+
+
 }
 
 
@@ -100,13 +123,12 @@ fun ChartWithLabels() {
 
 
 @Composable
-fun LineChart(modifier: Modifier = Modifier.size(110.dp, 110.dp).fillMaxWidth()) {
+fun LineChart(modifier: Modifier = Modifier
+    .size(110.dp, 110.dp)
+    .fillMaxWidth()) {
 
-
-
-    Box(modifier = modifier
+        Box(modifier = modifier
         .drawBehind { // we use drawBehind() method to create canvas
-
 
             // map data points to pixel values, in canvas we think in pixels
             val pixelPoints = values.map {
@@ -147,8 +169,8 @@ fun LineChart(modifier: Modifier = Modifier.size(110.dp, 110.dp).fillMaxWidth())
                 style = Stroke(width = 3f))
 
         })
-    }
 
+    }
 
 
 
