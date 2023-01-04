@@ -31,6 +31,7 @@ import com.google.maps.android.heatmaps.HeatmapTileProvider
 import nu.veberod.healthmonitor.R
 import nu.veberod.healthmonitor.presentation.screens.HeatMap
 import nu.veberod.healthmonitor.presentation.screens.HeatMapTab
+import nu.veberod.healthmonitor.presentation.graphs.ChartWithLabels
 import nu.veberod.healthmonitor.presentation.theme.HealthMonitorTheme
 import kotlin.collections.ArrayList
 
@@ -96,7 +97,7 @@ fun Pager(isVisible: Boolean, setVisibility: (Boolean) -> Unit){
         when(page){
             0-> Navigation(setVisibility)
 
-            1-> null //TODO: Add Graph Page
+            1-> ChartWithLabels()
 
             2->{
                 HeatMapTab(setVisibility)
