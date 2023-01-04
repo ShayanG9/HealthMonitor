@@ -126,21 +126,27 @@ fun HeatMapPreview(navCon : NavController){
             HeatMapTile()
         }
 
-        /*HeatMap(modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 0.dp))*/
-
-
-
 
     }
 
 }
+
+
 @Composable
 fun HeatMapTile(){
+    //val latLngs :MutableList<LatLng> = ArrayList()
+    //latLngs.add(LatLng(55.634944, 13.500889))
+    val d = listOf(Pair(55.634944, 13.500889))
 
-    val latLngs :MutableList<LatLng> = ArrayList()
-    latLngs.add(LatLng(55.634944, 13.500889))
-    val prov = HeatmapTileProvider.Builder().data(latLngs).build()
+    val prov = HeatmapTileProvider.Builder().data(getMapTileData(d)).build()
     TileOverlay(tileProvider = prov)
+}
+
+
+fun getMapTileData( d : List<Pair<Double, Double>>): MutableList<LatLng> {
+    val latLngs : MutableList<LatLng> = ArrayList()
+    for (i in d ){
+        latLngs.add(LatLng(i.first, i.second))
+    }
+    return latLngs
 }
