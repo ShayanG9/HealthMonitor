@@ -1,5 +1,7 @@
 package nu.veberod.healthmonitor.presentation.graphs
 
+import android.app.Activity
+import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -13,8 +15,10 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -57,7 +61,7 @@ fun getNum(){
 
 
 
-@Preview("graphs")
+//@Preview("graphs")
 @Composable
 fun ChartWithLabels() {
     getNum()
@@ -79,7 +83,6 @@ fun ChartWithLabels() {
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(text = maxYValue.roundToInt().toString(),color = Color.White)
-                //Text(text = minYValue.roundToInt().toString(),color = Color.Green)
             }
             LineChart()
         }
@@ -98,8 +101,6 @@ fun ChartWithLabels() {
 
 @Composable
 fun LineChart(modifier: Modifier = Modifier.size(110.dp, 110.dp).fillMaxWidth()) {
-
-    //fun LineChart(modifier: Modifier = Modifier.size(120.dp, 120.dp)) {
 
 
 
