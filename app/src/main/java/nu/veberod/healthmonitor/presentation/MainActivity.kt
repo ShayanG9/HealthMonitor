@@ -3,67 +3,37 @@ package nu.veberod.healthmonitor.presentation
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.wear.compose.material.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.VerticalPager
 import com.google.accompanist.pager.rememberPagerState
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
-import com.google.maps.android.heatmaps.HeatmapTileProvider
-import nu.veberod.healthmonitor.R
-import nu.veberod.healthmonitor.presentation.screens.HeatMap
 import nu.veberod.healthmonitor.presentation.screens.HeatMapTab
 import nu.veberod.healthmonitor.presentation.graphs.ChartWithLabels
 import nu.veberod.healthmonitor.presentation.theme.HealthMonitorTheme
-import kotlin.collections.ArrayList
 
 
 class MainActivity :  ComponentActivity(){
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Log.d("HEJ", "STARTING")
-        println("STARTING-----------------------------------------")
-        println("STARTING-----------------------------------------")
-        println("STARTING-----------------------------------------")
-        println("STARTING-----------------------------------------")
-        println("STARTING-----------------------------------------")
-        println("STARTING-----------------------------------------")
-        println("STARTING-----------------------------------------")
-        println("STARTING-----------------------------------------")
-        println("STARTING-----------------------------------------")
-        println("STARTING-----------------------------------------")
         val intent = Intent(this, MyService::class.java)
         startService(intent)
-
 
         setContent {
             WearApp()
         }
     }
-
-
 }
 
 

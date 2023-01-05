@@ -1,40 +1,37 @@
 package nu.veberod.healthmonitor.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.navigation.NavController
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Text
 import nu.veberod.healthmonitor.R
-import nu.veberod.healthmonitor.presentation.MainActivity
 import nu.veberod.healthmonitor.presentation.Screen
+import nu.veberod.healthmonitor.presentation.data.ApplicationViewModel
 import nu.veberod.healthmonitor.presentation.data.SensorData
-import nu.veberod.healthmonitor.presentation.graphs.values
+import nu.veberod.healthmonitor.presentation.data.Singleton
 import nu.veberod.healthmonitor.presentation.theme.*
 
 @Composable
-fun Overview(navController: NavController) {
+fun Overview(navController: NavController, viewModel : ApplicationViewModel = Singleton.viewModel) {
 
-//    var heartrate: Float by remember {
-//        mutableStateOf(SensorData.hej)
-//    }
+    Log.d("OVERVIEW ------------", viewModel.toString())
+    Log.d("OVERVIEW ------------", viewModel.toString())
+    Log.d("OVERVIEW ------------", viewModel.toString())
+    Log.d("OVERVIEW ------------", Singleton.toString())
 
-    var heartrate = 0f
-    var distance : Double = 3.5
-    var calories : Int = 349
-
-
+    val sensorsState = remember {
+        mutableStateOf( viewModel.sensorsState )
+    }
 
     Column (
         verticalArrangement = Arrangement.Center,
@@ -45,71 +42,18 @@ fun Overview(navController: NavController) {
     ) {
 
         Text(text = "Overview", fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(24.dp))
 
-        // ----------
-        // HEARTRATE
-        // ----------
+        Spacer(modifier = Modifier.height(16.dp))
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Image(
-                painterResource(id = R.drawable.heartcircle),
-                contentDescription = "",
-                modifier = Modifier.size(24.dp)
-            )
+        sensorRow(value = "${sensorsState.value.value.getHeartrate()} bpm", icon = R.drawable.heartcircle)
 
-            Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = "${heartrate} bpm", fontWeight = FontWeight.Bold)
-        }
-        
-        Spacer(modifier = Modifier.height(12.dp))
+        sensorRow(value = "${sensorsState.value.value.getSteps()} steg", icon = R.drawable.pointer)
 
-        // ----------
-        // SOME OTHER INFO
-        // ----------
+        Spacer(modifier = Modifier.height(8.dp))
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Image(
-                painterResource(id = R.drawable.pointer),
-                contentDescription = "",
-                modifier = Modifier.size(24.dp)
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Text(text = "$distance steg", fontWeight = FontWeight.Bold)
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // ----------
-        // SOME OTHER INFO
-        // ----------
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Image(
-                painterResource(id = R.drawable.flashcircle),
-                contentDescription = "",
-                modifier = Modifier.size(24.dp)
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Text(text = "$calories kcals", fontWeight = FontWeight.Bold)
-        }
+        sensorRow(value = "${sensorsState.value.value.getCalories()} kcal", icon = R.drawable.flashcircle)
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -128,4 +72,24 @@ fun Overview(navController: NavController) {
             )
         }
     }
+}
+
+@Composable
+fun sensorRow(value: String, icon: Int) {
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Image(
+            painterResource(id = icon),
+            contentDescription = "",
+            modifier = Modifier.size(24.dp)
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(text = value, fontWeight = FontWeight.Bold)
+    }
+
 }
