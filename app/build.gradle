@@ -3,6 +3,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
     id 'com.google.gms.google-services'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -36,6 +38,7 @@ android {
         freeCompilerArgs = ['-Xjvm-default=compatibility']
     }
     buildFeatures {
+        viewBinding true
         compose true
     }
     composeOptions {
@@ -91,6 +94,15 @@ dependencies {
 
     implementation "com.google.accompanist:accompanist-themeadapter-appcompat:0.28.0"
 
+
+    //Database
+    def room_version = "2.4.2"
+
+    implementation "androidx.room:room-ktx:$room_version"
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.4.1"
 
 
 

@@ -9,17 +9,28 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import nu.veberod.healthmonitor.presentation.database.AppDatabase
+import nu.veberod.healthmonitor.presentation.database.LocalDatabase
+import nu.veberod.healthmonitor.presentation.graphs.Point
+import nu.veberod.healthmonitor.presentation.graphs.valuesG
 import java.text.SimpleDateFormat
 import java.util.*
 
 class MyService : Service(){
 
+    //Database
+    private lateinit var appDb: AppDatabase
+
     //Sensor variables
+    var emulator: Boolean = false
     private lateinit var sensorManager: SensorManager
-    private lateinit var accelerometer: Sensor
+    private lateinit var accelerometer: Sensor;     private lateinit var gyroScope: Sensor
     private lateinit var heartRate: Sensor;     private lateinit var stepCounter: Sensor
-    private lateinit var gyroScope: Sensor;     private lateinit var sensorName: String
-    private lateinit var ecg: Sensor
+    private lateinit var fallDetection: Sensor
+    private lateinit var sensorName: String
     private var sensorData: MutableList<Float> = mutableListOf<Float>()
 
     @SuppressLint("SimpleDateFormat")
@@ -42,11 +53,17 @@ class MyService : Service(){
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        /** ----------------DEBUGGING---------------- */
-        println("Current thread " + Thread.currentThread().name)
-        /** ----------------DEBUGGING---------------- */
+        // RESET AND CREATE DATABASE.
+        appDb = AppDatabase.getDatabase(this)
+        GlobalScope.launch(Dispatchers.IO){
+            appDb.localDatabaseDao().deleteAll()
+        }
 
+        // INITIALIZE SENSORS.
         serviceHandler?.initializeSensors()
+
+        //serviceHandler?.initializeEmulatorSensors()
+
         return START_STICKY
     }
 
@@ -62,43 +79,59 @@ class MyService : Service(){
 
         fun initializeSensors()
         {
-            /** ----------------DEBUGGING---------------- */
-            println("Current thread " + Thread.currentThread().name)
-            /** ----------------DEBUGGING---------------- */
             // Get a reference to the SensorManager
             sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
             // Get a list of available sensors
             val sensorList = sensorManager.getSensorList(Sensor.TYPE_ALL)
             // Find the available sensors
+
             for (sensor in sensorList) {
-                //Print out the availabe senors
-                println(sensor)
-                if (sensor.type == 69669) {
-                    ecg = sensor
-                }
-                if (sensor.type == Sensor.TYPE_GYROSCOPE) {
-                    gyroScope = sensor
-                }
-                if (sensor.type == Sensor.TYPE_ACCELEROMETER) {
-                    accelerometer = sensor
-                }
                 if (sensor.type == Sensor.TYPE_HEART_RATE) {
                     heartRate = sensor
                 }
                 if (sensor.type == Sensor.TYPE_STEP_COUNTER) {
                     stepCounter = sensor
                 }
+                if (sensor.type == 69645) {
+                    fallDetection = sensor
+                }
             }
             registerListener()
         }
 
-        fun registerListener(){
-            // Register the SensorEventListener to receive updates from the sensors
+        fun initializeEmulatorSensors()
+        {
+            // Get a reference to the SensorManager
+            sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+
+            // Get a list of available sensors
+            val sensorList = sensorManager.getSensorList(Sensor.TYPE_ALL)
+            // Find the available sensors
+
+            for (sensor in sensorList) {
+
+                if (sensor.type == Sensor.TYPE_GYROSCOPE) {
+                    gyroScope = sensor
+                }
+                if (sensor.type == Sensor.TYPE_ACCELEROMETER) {
+                    //Update the graph in Graphs.kt
+                    accelerometer = sensor
+                }
+            }
+
             sensorManager.registerListener(this, gyroScope, 5000000, serviceHandler)
             sensorManager.registerListener(this, accelerometer, 5000000, serviceHandler)
+
+            emulator = true
+
+        }
+
+        fun registerListener(){
+            // Register the SensorEventListener to receive updates from the sensors
             sensorManager.registerListener(this, heartRate, 5000000, serviceHandler)
             sensorManager.registerListener(this, stepCounter, 50000000, serviceHandler)
+            sensorManager.registerListener(this, fallDetection, 50000000, serviceHandler)
 
         }
 
@@ -109,6 +142,11 @@ class MyService : Service(){
              * - Samsung HR Batch Sensor
              * - Samsung Step Counter
              * - AFE4500S ECG
+             *
+             * Changed the name of the sensors if using emulator.
+             * - Goldfish Heart rate sensor
+             * - Goldfish 3-axis Gyroscope
+             * - Goldfish 3-axis Accelerometer
              */
 
             // Get the name of the current sensor.
@@ -116,44 +154,92 @@ class MyService : Service(){
                 sensorName = p0.sensor.name
             }
 
-            if ("LSM6DSO Accelerometer" in sensorName)
+            if(!emulator)
             {
-                sensorData.add(p0!!.values[0])
-                sensorData.add(p0.values[1])
-                sensorData.add(p0.values[2])
-                saveSensorDataFirebase("Acc", sensorData)
+                if ("Samsung HR Batch Sensor" in sensorName)
+                {
+                    sensorData.add(p0!!.values[0])
+                    println(sensorData[0])
+
+                    //Update the graph in Graphs.kt
+                    valuesG.add(Point(valuesG.size.toFloat(), sensorData[0]))
+
+                    saveSensorData("Heart", sensorData)
+
+                }
+                else if ("Samsung Step Counter" in sensorName)
+                {
+                    sensorData.add(p0!!.values[0])
+                    saveSensorData("Step", sensorData)
+                }
+                else if ("Samsung FallDetection Sensor" in sensorName)
+                {
+                    sensorData.add(p0!!.values[0])
+                    saveSensorData("Step", sensorData)
+                }
             }
-            else if ("LSM6DSO Gyroscope" in sensorName)
-            {
-                sensorData.add(p0!!.values[0])
-                sensorData.add(p0.values[1])
-                sensorData.add(p0.values[2])
-                saveSensorDataFirebase("Gyro", sensorData)
+            else{
+                if ("Goldfish 3-axis Accelerometer" in sensorName)
+                {
+                    sensorData.add(p0!!.values[0])
+                    sensorData.add(p0.values[1])
+                    sensorData.add(p0.values[2])
+                    valuesG.add(Point(valuesG.size.toFloat(), 3.0.toFloat()))
+                    saveSensorData("Acc", sensorData)
+                }
+                else if ("Goldfish 3-axis Gyroscope" in sensorName)
+                {
+                    sensorData.add(p0!!.values[0])
+                    sensorData.add(p0.values[1])
+                    sensorData.add(p0.values[2])
+                    saveSensorData("Gyro", sensorData)
+                }
             }
-            else if ("Samsung HR Batch Sensor" in sensorName)
-            {
-                sensorData.add(p0!!.values[0])
-                saveSensorDataFirebase("Heart", sensorData)
-            }
-            else if ("Samsung Step Counter" in sensorName)
-            {
-                sensorData.add(p0!!.values[0])
-                saveSensorDataFirebase("Step", sensorData)
-            }
+
 
         }
 
         override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
         }
 
-        fun saveSensorDataFirebase(name: String, data: MutableList<Float>)
+        fun saveSensorData(name: String, data: MutableList<Float>)
         {
+            println(data)
             currentDate = sdf.format(Date())
-            //Sends the data to a database.
-            Database.sendData(name, data, currentDate)
+
+            //Sends the data to local and remote database.
+            /** LOCAL DATABASE --> RESULT IN APP INSPECTION **/
+            writeData(name, data)
+
+            /** REMOTE FIREBASE **/
+            //Database.sendData(name, data, currentDate)
+
 
             //Clear the data.
             sensorData.clear()
+        }
+
+
+        fun writeData(name: String, data: MutableList<Float>){
+
+            val new_data = LocalDatabase(
+                null,name, data[0]
+            )
+            GlobalScope.launch(Dispatchers.IO){
+                appDb.localDatabaseDao().insert(new_data)
+            }
+        }
+
+        fun readData(){
+
+            lateinit var localDatabase: List<LocalDatabase>
+
+            GlobalScope.launch {
+
+                localDatabase = appDb.localDatabaseDao().getAll()
+                println(localDatabase)
+
+            }
         }
 
     }
