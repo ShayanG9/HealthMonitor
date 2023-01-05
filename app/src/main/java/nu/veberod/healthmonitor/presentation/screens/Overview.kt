@@ -38,7 +38,7 @@ fun Overview(navController: NavController, viewModel : ApplicationViewModel = Si
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 50.dp, vertical = 20.dp)
+            .padding(horizontal = 30.dp, vertical = 15.dp)
     ) {
 
         Text(text = "Overview", fontWeight = FontWeight.Bold)
