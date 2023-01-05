@@ -38,7 +38,7 @@ import kotlin.random.Random
 data class Point(val x: Float, val y: Float)
 
 // List of points and min/max point values
-var values = mutableListOf<Point>()
+var valuesG = mutableListOf<Point>()
 var minXValue: Float = 0.0F
 var maxXValue: Float = 0.0F
 // find max and min value of Y, we will need that later
@@ -54,14 +54,15 @@ var unitX = "s"
 // random get numbers dummy test
 fun getNum(){
 
-    /* For dummy values
-    //for (i in 1..100){
-      //  values.add(Point(i-1f, Random.nextFloat()*100))
-   // }
-    //Random.nextFloat()*100
-    // find max and min value of X, we will need that later
+    /*
+     //For dummy values ditch this when collecting real data values
+    for (i in 1..100){
+        values.add(Point(i-1f, Random.nextFloat()*100))
+    }
+    Random.nextFloat()*100
     */
 
+    // use this instead
     /* Hi I tried to populate the values<point> list from the sensor
     reading event (MyService.kt) and it worked on the simulator, updates values in graph
 
@@ -71,11 +72,12 @@ fun getNum(){
 
      */
 
-    minXValue = values.minOf { it.x }
-    maxXValue = values.maxOf { it.x }
+    //find max and min value of X, we will need that later
+    minXValue = valuesG.minOf { it.x }
+    maxXValue = valuesG.maxOf { it.x }
     // find max and min value of Y, we will need that later
-    minYValue = values.minOf { it.y }
-    maxYValue = values.maxOf { it.y }
+    minYValue = valuesG.minOf { it.y }
+    maxYValue = valuesG.maxOf { it.y }
 
 }
 
@@ -131,7 +133,7 @@ fun LineChart(modifier: Modifier = Modifier
         .drawBehind { // we use drawBehind() method to create canvas
 
             // map data points to pixel values, in canvas we think in pixels
-            val pixelPoints = values.map {
+            val pixelPoints = valuesG.map {
                 // we use extension function to convert and scale initial values to pixels
                 val x = it.x.mapValueToDifferentRange(
                     inMin = minXValue,
