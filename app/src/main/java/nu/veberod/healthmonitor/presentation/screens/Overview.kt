@@ -45,15 +45,15 @@ fun Overview(navController: NavController, viewModel : ApplicationViewModel = Si
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        sensorRow(value = "${sensorsState.value.value.getHeartrate().toInt()} bpm", icon = R.drawable.heartcircle)
+        sensorRow(value = "${sensorsState.value.value.heartrate.toInt()} bpm", icon = R.drawable.heartcircle)
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        sensorRow(value = "${sensorsState.value.value.getSteps().toInt()} steg", icon = R.drawable.pointer)
+        sensorRow(value = "${sensorsState.value.value.steps.toInt()} steg", icon = R.drawable.pointer)
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        sensorRow(value = "${sensorsState.value.value.getCalories().toInt()} kcal", icon = R.drawable.flashcircle)
+        sensorRow(value = "${sensorsState.value.value.calories.toInt()} kcal", icon = R.drawable.flashcircle)
 
         Spacer(modifier = Modifier.height(8.dp))
 
