@@ -2,6 +2,7 @@ package nu.veberod.healthmonitor.presentation.screens
 
 import android.content.Intent
 import android.net.Uri
+import android.provider.ContactsContract.Contacts
 import android.provider.Settings.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -40,7 +41,7 @@ fun Settings(navController: NavController) {
             .padding(horizontal = 16.dp, vertical = 20.dp)
     ) {
 
-        Text(text = "Settings", fontWeight = FontWeight.Bold)
+        Text(text = "Inställningar", fontWeight = FontWeight.Bold)
 
         Spacer(modifier = Modifier.height(24.dp))
         
@@ -81,7 +82,15 @@ fun Settings(navController: NavController) {
 
         Button(
             onClick = {
-                navController.navigate(Screen.Settings.route)
+                val contactPickerIntent = Intent(Intent.CATEGORY_APP_CONTACTS, Contacts.CONTENT_URI)
+                startActivity(mContext, contactPickerIntent, null)
+
+                val intent = Intent(Intent.CATEGORY_APP_CONTACTS).also {
+                    it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    it.data = Uri.parse("package:$packageName")
+                }
+
+                startActivity(mContext, intent, null)
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF363636)),
             shape = RoundedCornerShape(8.dp),
@@ -99,7 +108,7 @@ fun Settings(navController: NavController) {
                         .size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
-                Text(text = "Contact")
+                Text(text = "Nödkontakt")
             }
         }
 
@@ -125,7 +134,7 @@ fun Settings(navController: NavController) {
                         .size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
-                Text(text = "Privacy")
+                Text(text = "Sekretess")
             }
         }
 
@@ -146,12 +155,13 @@ fun Settings(navController: NavController) {
                 Spacer(modifier = Modifier.width(16.dp))
                 Icon(
                     painter = painterResource(id = R.drawable.closecircle_light),
+                    tint = Color.White,
                     contentDescription = "",
                     modifier = Modifier
                         .size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
-                Text(text = "Back")
+                Text("Tillbaka", color = Color.White)
             }
         }
 

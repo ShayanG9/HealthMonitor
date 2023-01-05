@@ -3,6 +3,7 @@ package nu.veberod.healthmonitor.presentation
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -41,7 +42,18 @@ class MainActivity :  ComponentActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
+        Log.d("HEJ", "STARTING")
+        println("STARTING-----------------------------------------")
+        println("STARTING-----------------------------------------")
+        println("STARTING-----------------------------------------")
+        println("STARTING-----------------------------------------")
+        println("STARTING-----------------------------------------")
+        println("STARTING-----------------------------------------")
+        println("STARTING-----------------------------------------")
+        println("STARTING-----------------------------------------")
+        println("STARTING-----------------------------------------")
+        println("STARTING-----------------------------------------")
         val intent = Intent(this, MyService::class.java)
         startService(intent)
 
