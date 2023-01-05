@@ -9,7 +9,11 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.*
+import android.os.FileObserver.CREATE
 import androidx.compose.runtime.mutableStateOf
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import nu.veberod.healthmonitor.presentation.data.Singleton
 import java.text.SimpleDateFormat
 import java.util.*
@@ -17,9 +21,9 @@ import java.util.*
 class MyService : Service(){
 
     //Database
-//    private lateinit var appDb: AppDatabase
+    private lateinit var appDb: AppDatabase
 
-    //Sensor variables
+    Sensor variables
     var emulator: Boolean = false
     private lateinit var sensorManager: SensorManager
     private lateinit var accelerometer: Sensor;
@@ -30,11 +34,6 @@ class MyService : Service(){
     private lateinit var sensorName: String
     private var sensorData: MutableList<Float> = mutableListOf<Float>()
     private val viewModel = Singleton.viewModel
-
-    var heartRateData = mutableStateOf(0f)
-//    var heartRateData: Float = 0f
-    var stepsData: Float = 0f
-    var caloriesData: Float = 0f
 
     @SuppressLint("SimpleDateFormat")
     private val sdf = SimpleDateFormat("MM-dd-yyyy HH:mm:ss")
@@ -56,14 +55,14 @@ class MyService : Service(){
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // RESET AND CREATE DATABASE.
-//        appDb = AppDatabase.getDatabase(this)
-//        GlobalScope.launch(Dispatchers.IO){
-//            appDb.localDatabaseDao().deleteAll()
-//        }
+//         RESET AND CREATE DATABASE.
+        appDb = AppDatabase.getDatabase(this)
+        GlobalScope.launch(Dispatchers.IO){
+            appDb.localDatabaseDao().deleteAll()
+        }
 
-        // INITIALIZE SENSORS.
-//        serviceHandler?.initializeSensors()
+//         INITIALIZE SENSORS.
+        serviceHandler?.initializeSensors()
 
         serviceHandler?.initializeEmulatorSensors()
 
@@ -166,20 +165,20 @@ class MyService : Service(){
                     println(sensorData[0])
 
                     //Update the graph in Graphs.kt
-//                    valuesG.add(Point(valuesG.size.toFloat(), sensorData[0]))
+                    valuesG.add(Point(valuesG.size.toFloat(), sensorData[0]))
 
-//                    saveSensorData("Heart", sensorData)
+                    saveSensorData("Heart", sensorData)
 
                 }
                 else if ("Samsung Step Counter" in sensorName)
                 {
                     sensorData.add(p0!!.values[0])
-//                    saveSensorData("Step", sensorData)
+                    saveSensorData("Step", sensorData)
                 }
                 else if ("Samsung FallDetection Sensor" in sensorName)
                 {
                     sensorData.add(p0!!.values[0])
-//                    saveSensorData("Step", sensorData)
+                    saveSensorData("Step", sensorData)
                 }
             }
             else{
@@ -188,18 +187,18 @@ class MyService : Service(){
                     sensorData.add(p0!!.values[0])
                     sensorData.add(p0.values[1])
                     sensorData.add(p0.values[2])
-//                    valuesG.add(Point(valuesG.size.toFloat(), 3.0.toFloat()))
+                    valuesG.add(Point(valuesG.size.toFloat(), 3.0.toFloat()))
 
                     viewModel.updateSensors(p0.values[0], p0.values[0], p0.values[0])
 
-//                    saveSensorData("Acc", sensorData)
+                    saveSensorData("Acc", sensorData)
                 }
                 else if ("Goldfish 3-axis Gyroscope" in sensorName)
                 {
                     sensorData.add(p0!!.values[0])
                     sensorData.add(p0.values[1])
                     sensorData.add(p0.values[2])
-//                    saveSensorData("Gyro", sensorData)
+                    saveSensorData("Gyro", sensorData)
                 }
             }
 
@@ -209,45 +208,45 @@ class MyService : Service(){
         override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
         }
 
-//        fun saveSensorData(name: String, data: MutableList<Float>)
-//        {
-//            println(data)
-//            currentDate = sdf.format(Date())
-//
-//            //Sends the data to local and remote database.
-//            /** LOCAL DATABASE --> RESULT IN APP INSPECTION **/
-////            writeData(name, data)
-//
-//            /** REMOTE FIREBASE **/
-//            //Database.sendData(name, data, currentDate)
-//
-//
-//            //Clear the data.
-//            sensorData.clear()
-//        }
+        fun saveSensorData(name: String, data: MutableList<Float>)
+        {
+            println(data)
+            currentDate = sdf.format(Date())
+
+            //Sends the data to local and remote database.
+            /** LOCAL DATABASE --> RESULT IN APP INSPECTION **/
+            writeData(name, data)
+
+            /** REMOTE FIREBASE **/
+            Database.sendData(name, data, currentDate)
 
 
-//        fun writeData(name: String, data: MutableList<Float>){
-//
-//            val new_data = LocalDatabase(
-//                null,name, data[0]
-//            )
-//            GlobalScope.launch(Dispatchers.IO){
-//                appDb.localDatabaseDao().insert(new_data)
-//            }
-//        }
-//
-//        fun readData(){
-//
-//            lateinit var localDatabase: List<LocalDatabase>
-//
-//            GlobalScope.launch {
-//
-//                localDatabase = appDb.localDatabaseDao().getAll()
-//                println(localDatabase)
-//
-//            }
-//        }
+            //Clear the data.
+            sensorData.clear()
+        }
+
+
+        fun writeData(name: String, data: MutableList<Float>){
+
+            val new_data = LocalDatabase(
+                null,name, data[0]
+            )
+            GlobalScope.launch(Dispatchers.IO){
+                appDb.localDatabaseDao().insert(new_data)
+            }
+        }
+
+        fun readData(){
+
+            lateinit var localDatabase: List<LocalDatabase>
+
+            GlobalScope.launch {
+
+                localDatabase = appDb.localDatabaseDao().getAll()
+                println(localDatabase)
+
+            }
+        }
 
     }
 }
