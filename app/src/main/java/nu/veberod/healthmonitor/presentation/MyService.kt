@@ -9,8 +9,12 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.*
+
+import nu.veberod.healthmonitor.presentation.graphs.Point
+import nu.veberod.healthmonitor.presentation.graphs.valuesG
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.random.Random
 
 class MyService : Service(){
 
@@ -76,6 +80,8 @@ class MyService : Service(){
                 if (sensor.type == Sensor.TYPE_ACCELEROMETER) {
                     accelerometer = sensor
                 }
+
+
                 /** --UNCOMMENT IF USING SMARTWATCH--
                 if (sensor.type == Sensor.TYPE_HEART_BEAT) {
                 heartBeat = sensor
@@ -95,6 +101,7 @@ class MyService : Service(){
             // Register the SensorEventListener to receive updates from the sensors
             sensorManager.registerListener(this, gyroScope, SensorManager.SENSOR_DELAY_NORMAL, serviceHandler)
             sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL, serviceHandler)
+
             /** --UNCOMMENT IF USING SMARTWATCH--
              * sensorManager.registerListener(this, heartBeat, SensorManager.SENSOR_DELAY_NORMAL, serviceHandler)
              * sensorManager.registerListener(this, heartRate, SensorManager.SENSOR_DELAY_NORMAL, serviceHandler)
@@ -118,6 +125,9 @@ class MyService : Service(){
                 SensorData.add(p0.values[1])
                 SensorData.add(p0.values[2])
                 saveSensorData("accelerometer", SensorData)
+
+                //Push data to graphs, change to "heart rate"
+                valuesG.add(Point(valuesG.size.toFloat(),p0!!.values[0]))
             }
             else if ("Gyroscope" in sensorName)
             {
@@ -125,7 +135,11 @@ class MyService : Service(){
                 SensorData.add(p0.values[1])
                 SensorData.add(p0.values[2])
                 saveSensorData("gyroscope", SensorData)
+
             }
+
+
+
             /** UNCOMMENT IF ON SMARTWATCH
             else if ("Heart Beat" in sensorName)
             {
