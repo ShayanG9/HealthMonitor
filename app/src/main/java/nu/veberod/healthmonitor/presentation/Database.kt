@@ -1,5 +1,4 @@
 package nu.veberod.healthmonitor.presentation
-
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
@@ -10,27 +9,6 @@ import com.google.firebase.database.FirebaseDatabase
 
 class Database{
     companion object {
-
-        fun sendData(timestamp: String){
-            val database = FirebaseDatabase.getInstance().reference
-
-            val data_user = database.child("data")
-                .child("user")
-                .child(androidID!!)
-                .child("timestamp")
-                .child(timestamp)
-
-            data_user.child("ax").setValue(0)
-            data_user.child("ay").setValue(0)
-            data_user.child("az").setValue(0)
-            data_user.child("gx").setValue(0)
-            data_user.child("gy").setValue(0)
-            data_user.child("gz").setValue(0)
-            data_user.child("eeg").setValue(0)
-            data_user.child("pulse").setValue(0)
-            data_user.child("beat").setValue(0)
-            data_user.child("steps").setValue(0)
-        }
 
         fun sendHeatMap(timestamp: String, data:Int){
             val database = FirebaseDatabase.getInstance().reference
@@ -55,7 +33,37 @@ class Database{
 
         }
 
+      fun sendSteps(timestamp: String, steps: Int){
+            val database = FirebaseDatabase.getInstance().reference
+
+            val data_user = database.child("data")
+                .child("user")
+                .child(androidID!!)
+                .child("steps")
+                .child("timestamp")
+                .child(timestamp)
+
+            data_user.setValue(steps)
+
+        }
+
+
+        fun sendHeartRate(timestamp: String, rate: Float){
+            val database = FirebaseDatabase.getInstance().reference
+
+            val data_user = database.child("data")
+                .child("user")
+                .child(androidID!!)
+                .child("heartRate")
+                .child("timestamp")
+                .child(timestamp)
+
+            data_user.setValue(rate)
+
+        }
+        
         fun readHeatMapData(): MutableList<Pair<LatLng, Int>> {
+
             val database = FirebaseDatabase.getInstance().reference
             val data_user = database.child("heatmap").child("user")
 
@@ -109,7 +117,6 @@ class Database{
                 .child(timestamp).setValue("Fall Detected")
 
         }
-
 
 
     }
