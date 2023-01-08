@@ -11,7 +11,8 @@ class ApplicationViewModel() : ViewModel() {
         sensorsState.value = sensorsState.value.copy(
             heartrate = a,
             steps = b,
-            calories = c
+            calories = c,
+            fall = sensorsState.value.fall
         )
     }
 
@@ -19,7 +20,8 @@ class ApplicationViewModel() : ViewModel() {
         sensorsState.value = sensorsState.value.copy(
             heartrate = newValue,
             steps = sensorsState.value.steps,
-            calories = sensorsState.value.calories
+            calories = sensorsState.value.calories,
+            fall = sensorsState.value.fall
         )
     }
 
@@ -27,7 +29,8 @@ class ApplicationViewModel() : ViewModel() {
         sensorsState.value = sensorsState.value.copy(
             heartrate = sensorsState.value.heartrate,
             steps = newValue,
-            calories = sensorsState.value.calories
+            calories = sensorsState.value.calories,
+            fall = sensorsState.value.fall
         )
     }
 
@@ -35,7 +38,17 @@ class ApplicationViewModel() : ViewModel() {
         sensorsState.value = sensorsState.value.copy(
             heartrate = sensorsState.value.heartrate,
             steps = sensorsState.value.steps,
-            calories = newValue
+            calories = newValue,
+            fall = sensorsState.value.fall
         )
     }
+    fun updateFall(newValue: Boolean) {
+        sensorsState.value = sensorsState.value.copy(
+            heartrate = sensorsState.value.heartrate,
+            steps = sensorsState.value.steps,
+            calories = sensorsState.value.calories,
+            fall = newValue
+        )
+    }
+
 }

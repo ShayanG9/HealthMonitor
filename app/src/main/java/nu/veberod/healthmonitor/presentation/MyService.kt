@@ -11,10 +11,12 @@ import android.hardware.SensorManager
 import android.os.*
 
 import android.provider.ContactsContract.Data
+import androidx.lifecycle.viewModelScope
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import nu.veberod.healthmonitor.presentation.data.Singleton
 import nu.veberod.healthmonitor.presentation.database.AppDatabase
 import nu.veberod.healthmonitor.presentation.database.LocalDatabase
 import nu.veberod.healthmonitor.presentation.graphs.Point
@@ -179,8 +181,14 @@ class MyService : Service(){
                     //Update the graph in Graphs.kt
                     valuesG.add(Point(valuesG.size.toFloat(), sensorData[0]))
 
-                    //saveSensorData("Heart", sensorData)
+                    saveSensorData("Heart", sensorData)
                     Database.sendHeartRate(sdf.format(Date()), p0!!.values[0])
+                    Singleton.viewModel.updateHeartrate(p0!!.values[0])
+
+                    Singleton.viewModel.viewModelScope.launch {
+                        Singleton.viewModel.updateHeartrate(p0!!.values[0])
+                    }
+
 
 
                 }
@@ -188,14 +196,19 @@ class MyService : Service(){
                 {
                     sensorData.add(p0!!.values[0])
 
-                    //saveSensorData("Step", sensorData)
+                    saveSensorData("Step", sensorData)
                     Database.sendSteps(sdf.format(Date()), p0!!.values[0].toInt())
+                    Singleton.viewModel.viewModelScope.launch {
+                        Singleton.viewModel.updateSteps(p0!!.values[0])
+                    }
 
                 }
                 else if ("Samsung FallDetection Sensor" in sensorName)
                 {
                     sensorData.add(p0!!.values[0])
-
+                    Singleton.viewModel.viewModelScope.launch {
+                        Singleton.viewModel.updateFall(true)
+                    }
                     Database.sendFall(sdf.format(Date()))
                 }
 
@@ -209,7 +222,7 @@ class MyService : Service(){
                     sensorData.add(p0.values[2])
                     valuesG.add(Point(valuesG.size.toFloat(), 3.0.toFloat()))
 
-                    //saveSensorData("Acc", sensorData)
+                    saveSensorData("Acc", sensorData)
 
                 }
                 else if ("Goldfish 3-axis Gyroscope" in sensorName)
@@ -218,7 +231,7 @@ class MyService : Service(){
                     sensorData.add(p0.values[1])
                     sensorData.add(p0.values[2])
 
-                    //saveSensorData("Gyro", sensorData)
+                    saveSensorData("Gyro", sensorData)
 
                 }
             }
