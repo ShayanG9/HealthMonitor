@@ -33,7 +33,7 @@ class Database{
 
         }
 
-        fun sendSteps(timestamp: String, steps: Int){
+      fun sendSteps(timestamp: String, steps: Int){
             val database = FirebaseDatabase.getInstance().reference
 
             val data_user = database.child("data")
@@ -61,9 +61,9 @@ class Database{
             data_user.setValue(rate)
 
         }
+        
+        fun readHeatMapData(): MutableList<Pair<LatLng, Int>> {
 
-
-        fun readHeatMapData(){
             val database = FirebaseDatabase.getInstance().reference
             val data_user = database.child("heatmap").child("user")
 
@@ -89,14 +89,12 @@ class Database{
 
                     retData.add(Pair(LatLng(lat as Double, lng as Double), (steps as Long).toInt()))
 
-                    Log.i("test", retData.toString())
 
-                    // do what you want with key and value
                 }
 
             }
 
-            return
+            return retData
 
         }
 
