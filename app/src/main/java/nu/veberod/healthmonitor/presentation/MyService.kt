@@ -9,6 +9,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.*
+
 import android.provider.ContactsContract.Data
 
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +19,7 @@ import nu.veberod.healthmonitor.presentation.database.AppDatabase
 import nu.veberod.healthmonitor.presentation.database.LocalDatabase
 import nu.veberod.healthmonitor.presentation.graphs.Point
 import nu.veberod.healthmonitor.presentation.graphs.valuesG
+
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.random.Random
@@ -27,6 +29,7 @@ class MyService : Service(){
     //Database
     private lateinit var appDb: AppDatabase
 
+
     //Sensor variables
     var emulator: Boolean = false
     private lateinit var sensorManager: SensorManager
@@ -35,6 +38,7 @@ class MyService : Service(){
     private lateinit var fallDetection: Sensor
     private lateinit var sensorName: String
     private var sensorData: MutableList<Float> = mutableListOf<Float>()
+
 
     @SuppressLint("SimpleDateFormat")
     private val sdf = SimpleDateFormat("MM-dd-yyyy HH:mm:ss")
@@ -56,7 +60,9 @@ class MyService : Service(){
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+
         // RESET AND CREATE DATABASE.
+
         appDb = AppDatabase.getDatabase(this)
         GlobalScope.launch(Dispatchers.IO){
             appDb.localDatabaseDao().deleteAll()
@@ -127,7 +133,9 @@ class MyService : Service(){
             sensorManager.registerListener(this, gyroScope, 5000000, serviceHandler)
             sensorManager.registerListener(this, accelerometer, 5000000, serviceHandler)
 
+
             emulator = false
+
 
         }
 
@@ -141,6 +149,7 @@ class MyService : Service(){
         }
 
         override fun onSensorChanged(p0: SensorEvent?) {
+
             /** |----Name of the sensors----|
              * - LSM6DSO Accelerometer
              * - LSM6DSO Gyroscope
@@ -153,6 +162,7 @@ class MyService : Service(){
              * - Goldfish 3-axis Gyroscope
              * - Goldfish 3-axis Accelerometer
              */
+
 
             // Get the name of the current sensor.
             if (p0 != null) {
@@ -172,18 +182,23 @@ class MyService : Service(){
                     //saveSensorData("Heart", sensorData)
                     Database.sendHeartRate(sdf.format(Date()), p0!!.values[0])
 
+
                 }
                 else if ("Samsung Step Counter" in sensorName)
                 {
                     sensorData.add(p0!!.values[0])
+
                     //saveSensorData("Step", sensorData)
                     Database.sendSteps(sdf.format(Date()), p0!!.values[0].toInt())
+
                 }
                 else if ("Samsung FallDetection Sensor" in sensorName)
                 {
                     sensorData.add(p0!!.values[0])
+
                     Database.sendFall(sdf.format(Date()))
                 }
+
 
             }
             else{
@@ -193,14 +208,18 @@ class MyService : Service(){
                     sensorData.add(p0.values[1])
                     sensorData.add(p0.values[2])
                     valuesG.add(Point(valuesG.size.toFloat(), 3.0.toFloat()))
+
                     //saveSensorData("Acc", sensorData)
+
                 }
                 else if ("Goldfish 3-axis Gyroscope" in sensorName)
                 {
                     sensorData.add(p0!!.values[0])
                     sensorData.add(p0.values[1])
                     sensorData.add(p0.values[2])
+
                     //saveSensorData("Gyro", sensorData)
+
                 }
             }
 
@@ -220,7 +239,9 @@ class MyService : Service(){
             writeData(name, data)
 
             /** REMOTE FIREBASE **/
+
             //Database.sendData(name, data, currentDate)
+
 
 
             //Clear the data.

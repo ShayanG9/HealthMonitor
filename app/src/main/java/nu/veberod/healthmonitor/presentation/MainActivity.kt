@@ -15,17 +15,10 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-
-
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,6 +48,7 @@ var androidID: String? = null
 
 class MainActivity :  ComponentActivity(){
 
+
     private val sdf = SimpleDateFormat("MM-dd-yyyy HH:mm:ss")
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,6 +62,7 @@ class MainActivity :  ComponentActivity(){
             WearApp()
         }
     }
+
 
     private fun init(){
         getAndroidID()
@@ -132,6 +127,7 @@ class MainActivity :  ComponentActivity(){
 
         }
     }
+
 }
 
 
