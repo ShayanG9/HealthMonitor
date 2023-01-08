@@ -85,22 +85,30 @@ class MainActivity :  ComponentActivity(){
     override fun onDestroy() {
         super.onDestroy()
         updateHeatMapData()
+    }
 
-    private fun setPermission(){
+    private fun setPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION)
-            != PackageManager.PERMISSION_GRANTED) {
+            != PackageManager.PERMISSION_GRANTED
+        ) {
             // Permission is not granted, request it
-            ActivityCompat.requestPermissions(this,
+            ActivityCompat.requestPermissions(
+                this,
                 arrayOf(Manifest.permission.ACTIVITY_RECOGNITION),
-                1)
+                1
+            )
         }
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS)
-            != PackageManager.PERMISSION_GRANTED) {
+            != PackageManager.PERMISSION_GRANTED
+        ) {
             // Permission is not granted, request it
-            ActivityCompat.requestPermissions(this,
+            ActivityCompat.requestPermissions(
+                this,
                 arrayOf(Manifest.permission.BODY_SENSORS),
-                1)
+                1
+            )
 
+        }
     }
 
     private fun updateHeatMapData(){

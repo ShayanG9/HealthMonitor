@@ -133,8 +133,8 @@ class MyService : Service(){
         fun registerListener(){
             // Register the SensorEventListener to receive updates from the sensors
             sensorManager.registerListener(this, heartRate, 5000000, serviceHandler)
-            sensorManager.registerListener(this, stepCounter, 50000000, serviceHandler)
-            sensorManager.registerListener(this, fallDetection, 50000000, serviceHandler)
+            //sensorManager.registerListener(this, stepCounter, 50000000, serviceHandler)
+            //sensorManager.registerListener(this, fallDetection, 50000000, serviceHandler)
 
 
         }
