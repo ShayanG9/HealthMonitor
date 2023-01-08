@@ -4,17 +4,14 @@ package nu.veberod.healthmonitor.presentation
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 
-import android.os.Looper
-import androidx.annotation.RequiresApi
 import android.provider.Settings.Secure
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -24,27 +21,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.wear.compose.material.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.VerticalPager
 import com.google.accompanist.pager.rememberPagerState
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.FirebaseApp
-import nu.veberod.healthmonitor.R
-import nu.veberod.healthmonitor.presentation.Database.Companion.readHeatMapData
 import nu.veberod.healthmonitor.presentation.data.Singleton
-import nu.veberod.healthmonitor.presentation.screens.HeatMap
 import nu.veberod.healthmonitor.presentation.screens.HeatMapTab
 import nu.veberod.healthmonitor.presentation.graphs.ChartWithLabels
 import nu.veberod.healthmonitor.presentation.screens.Fall
 import nu.veberod.healthmonitor.presentation.theme.HealthMonitorTheme
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 var androidID: String? = null
 
@@ -112,7 +100,7 @@ class MainActivity :  ComponentActivity(){
         val data = Database.readHeatMapTimestamp()
         while(!data.isComplete);
 
-        if(data.isSuccessful){
+        if(data.isSuccessful && data.result.value != null){
 
             var savedDate: Date = sdf.parse(data.result.value as String)
             val currentDate = Date()
@@ -121,11 +109,15 @@ class MainActivity :  ComponentActivity(){
             Log.i("test", elapsedTime.toString())
 
             if( elapsedTime >  24){
-                Database.sendHeatMap(sdf.format(currentDate), 100)
+                //Use below if emulating
+                //Database.sendHeatMap(sdf.format(currentDate), 100)
+                Database.sendHeatMap(sdf.format(Date()), Singleton.viewModel.sensorsState.value.steps)
             }
 
         }else{
-            Database.sendHeatMap(sdf.format(Date()), 100)
+            //Use below if emulating
+            //Database.sendHeatMap(sdf.format(Date()), 100)
+            Database.sendHeatMap(sdf.format(Date()), Singleton.viewModel.sensorsState.value.steps)
 
         }
     }
@@ -154,7 +146,7 @@ fun WearApp() {
 
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun Pager(isVisible: Boolean, setVisibility: (Boolean) -> Unit){
 
@@ -172,22 +164,27 @@ fun Pager(isVisible: Boolean, setVisibility: (Boolean) -> Unit){
         }
 
     }
+    CompositionLocalProvider(
+        LocalOverscrollConfiguration provides null
+    ) {
+        VerticalPager(count = 3, state= pagerState) { page ->
+            // Our page content
 
-    VerticalPager(count = 3, state= pagerState) { page ->
-        // Our page content
 
+            when(page){
+                0-> Navigation(setVisibility)
 
-        when(page){
-            0-> Navigation(setVisibility)
+                1-> ChartWithLabels()
 
-            1-> null//ChartWithLabels()
-
-            2->{
-                HeatMapTab(setVisibility)
+                2->{
+                    HeatMapTab(setVisibility)
+                }
             }
+
         }
 
     }
+
 
     if(isVisible) {
         HorizontalPageIndicator(

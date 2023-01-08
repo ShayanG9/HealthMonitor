@@ -10,7 +10,7 @@ import com.google.firebase.database.FirebaseDatabase
 class Database{
     companion object {
 
-        fun sendHeatMap(timestamp: String, data:Int){
+        fun sendHeatMap(timestamp: String, data: Float){
             val database = FirebaseDatabase.getInstance().reference
             val data_user = database.child("heatmap")
                 .child("user")

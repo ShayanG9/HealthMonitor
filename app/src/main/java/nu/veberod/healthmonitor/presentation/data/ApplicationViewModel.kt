@@ -2,6 +2,8 @@ package nu.veberod.healthmonitor.presentation.data
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import nu.veberod.healthmonitor.presentation.graphs.Point
+import nu.veberod.healthmonitor.presentation.graphs.valuesG
 
 class ApplicationViewModel() : ViewModel() {
 
@@ -12,7 +14,8 @@ class ApplicationViewModel() : ViewModel() {
             heartrate = a,
             steps = b,
             calories = c,
-            fall = sensorsState.value.fall
+            fall = sensorsState.value.fall,
+            points = sensorsState.value.points
         )
     }
 
@@ -21,8 +24,10 @@ class ApplicationViewModel() : ViewModel() {
             heartrate = newValue,
             steps = sensorsState.value.steps,
             calories = sensorsState.value.calories,
-            fall = sensorsState.value.fall
+            fall = sensorsState.value.fall,
+            points = sensorsState.value.points
         )
+
     }
 
     fun updateSteps(newValue: Float) {
@@ -30,7 +35,19 @@ class ApplicationViewModel() : ViewModel() {
             heartrate = sensorsState.value.heartrate,
             steps = newValue,
             calories = sensorsState.value.calories,
-            fall = sensorsState.value.fall
+            fall = sensorsState.value.fall,
+            points = sensorsState.value.points
+        )
+    }
+
+    fun updatePoints(newValue: Float){
+        sensorsState.value.points.add(Point( sensorsState.value.points.size.toFloat(), newValue))
+        sensorsState.value = sensorsState.value.copy(
+            heartrate = sensorsState.value.heartrate,
+            steps = sensorsState.value.steps,
+            calories = sensorsState.value.calories,
+            fall = sensorsState.value.fall,
+            points = sensorsState.value.points
         )
     }
 
@@ -39,7 +56,8 @@ class ApplicationViewModel() : ViewModel() {
             heartrate = sensorsState.value.heartrate,
             steps = sensorsState.value.steps,
             calories = newValue,
-            fall = sensorsState.value.fall
+            fall = sensorsState.value.fall,
+            points = sensorsState.value.points
         )
     }
     fun updateFall(newValue: Boolean) {
@@ -47,7 +65,8 @@ class ApplicationViewModel() : ViewModel() {
             heartrate = sensorsState.value.heartrate,
             steps = sensorsState.value.steps,
             calories = sensorsState.value.calories,
-            fall = newValue
+            fall = newValue,
+            points = sensorsState.value.points
         )
     }
 
