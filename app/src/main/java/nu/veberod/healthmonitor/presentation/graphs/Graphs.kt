@@ -1,6 +1,7 @@
 package nu.veberod.healthmonitor.presentation.graphs
 
 import android.app.Activity
+
 import android.graphics.Insets.add
 import android.view.View
 import androidx.compose.foundation.background
@@ -31,6 +32,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.composable
 import nu.veberod.healthmonitor.presentation.screens.HeatMapPreview
 import java.nio.file.Files.size
+
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -68,6 +70,7 @@ fun getNum(){
     // use this instead
     /* Hi I tried to populate the values<point> list from the sensor
     reading event (MyService.kt) and it worked on the simulator, updates values in graph
+
 
     something like this in the "heart rate" reading*/
     valuesG.add(Point(valuesG.size.toFloat(), 0.toFloat()))
@@ -122,6 +125,8 @@ fun ChartWithLabels() {
 
 }
 
+}
+
 
 
 
@@ -131,7 +136,7 @@ fun LineChart(modifier: Modifier = Modifier
     .size(110.dp, 110.dp)
     .fillMaxWidth()) {
 
-    Box(modifier = modifier
+        Box(modifier = modifier
         .drawBehind { // we use drawBehind() method to create canvas
 
             // map data points to pixel values, in canvas we think in pixels
@@ -175,6 +180,7 @@ fun LineChart(modifier: Modifier = Modifier
         })
 
 }
+
 
 
 

@@ -9,6 +9,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.*
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -18,6 +19,7 @@ import nu.veberod.healthmonitor.presentation.graphs.Point
 import nu.veberod.healthmonitor.presentation.graphs.valuesG
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.random.Random
 
 class MyService : Service(){
 
@@ -118,6 +120,7 @@ class MyService : Service(){
                     //Update the graph in Graphs.kt
                     accelerometer = sensor
                 }
+
             }
 
             sensorManager.registerListener(this, gyroScope, 5000000, serviceHandler)
@@ -132,6 +135,7 @@ class MyService : Service(){
             sensorManager.registerListener(this, heartRate, 5000000, serviceHandler)
             sensorManager.registerListener(this, stepCounter, 50000000, serviceHandler)
             sensorManager.registerListener(this, fallDetection, 50000000, serviceHandler)
+
 
         }
 
@@ -177,6 +181,7 @@ class MyService : Service(){
                     sensorData.add(p0!!.values[0])
                     saveSensorData("Step", sensorData)
                 }
+
             }
             else{
                 if ("Goldfish 3-axis Accelerometer" in sensorName)
