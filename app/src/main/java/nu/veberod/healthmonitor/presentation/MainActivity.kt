@@ -36,9 +36,11 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.FirebaseApp
 import nu.veberod.healthmonitor.R
 import nu.veberod.healthmonitor.presentation.Database.Companion.readHeatMapData
+import nu.veberod.healthmonitor.presentation.data.Singleton
 import nu.veberod.healthmonitor.presentation.screens.HeatMap
 import nu.veberod.healthmonitor.presentation.screens.HeatMapTab
 import nu.veberod.healthmonitor.presentation.graphs.ChartWithLabels
+import nu.veberod.healthmonitor.presentation.screens.Fall
 import nu.veberod.healthmonitor.presentation.theme.HealthMonitorTheme
 import java.text.SimpleDateFormat
 import java.util.*
@@ -140,7 +142,12 @@ fun WearApp() {
 
     HealthMonitorTheme {
         var isVisible by remember {mutableStateOf(true)}
+        var isFall  =  Singleton.viewModel.sensorsState.value.fall
+        if(!isFall){
         Pager(isVisible, setVisibility = {isVisible = it})
+        }else{
+            Fall()
+        }
 
     }
 
