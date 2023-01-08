@@ -9,6 +9,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.*
+import android.provider.ContactsContract.Data
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -126,15 +127,15 @@ class MyService : Service(){
             sensorManager.registerListener(this, gyroScope, 5000000, serviceHandler)
             sensorManager.registerListener(this, accelerometer, 5000000, serviceHandler)
 
-            emulator = true
+            emulator = false
 
         }
 
         fun registerListener(){
             // Register the SensorEventListener to receive updates from the sensors
             sensorManager.registerListener(this, heartRate, 5000000, serviceHandler)
-            //sensorManager.registerListener(this, stepCounter, 50000000, serviceHandler)
-            //sensorManager.registerListener(this, fallDetection, 50000000, serviceHandler)
+            sensorManager.registerListener(this, stepCounter, 50000000, serviceHandler)
+            sensorManager.registerListener(this, fallDetection, 50000000, serviceHandler)
 
 
         }
@@ -168,18 +169,20 @@ class MyService : Service(){
                     //Update the graph in Graphs.kt
                     valuesG.add(Point(valuesG.size.toFloat(), sensorData[0]))
 
-                    saveSensorData("Heart", sensorData)
+                    //saveSensorData("Heart", sensorData)
+                    Database.sendHeartRate(sdf.format(Date()), p0!!.values[0])
 
                 }
                 else if ("Samsung Step Counter" in sensorName)
                 {
                     sensorData.add(p0!!.values[0])
-                    saveSensorData("Step", sensorData)
+                    //saveSensorData("Step", sensorData)
+                    Database.sendSteps(sdf.format(Date()), p0!!.values[0].toInt())
                 }
                 else if ("Samsung FallDetection Sensor" in sensorName)
                 {
                     sensorData.add(p0!!.values[0])
-                    saveSensorData("Step", sensorData)
+                    Database.sendFall(sdf.format(Date()))
                 }
 
             }
@@ -190,14 +193,14 @@ class MyService : Service(){
                     sensorData.add(p0.values[1])
                     sensorData.add(p0.values[2])
                     valuesG.add(Point(valuesG.size.toFloat(), 3.0.toFloat()))
-                    saveSensorData("Acc", sensorData)
+                    //saveSensorData("Acc", sensorData)
                 }
                 else if ("Goldfish 3-axis Gyroscope" in sensorName)
                 {
                     sensorData.add(p0!!.values[0])
                     sensorData.add(p0.values[1])
                     sensorData.add(p0.values[2])
-                    saveSensorData("Gyro", sensorData)
+                    //saveSensorData("Gyro", sensorData)
                 }
             }
 
