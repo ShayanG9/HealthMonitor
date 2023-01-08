@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.BODY_SENSORS" />
     <uses-feature android:name="android.hardware.type.watch"
         android:required="true" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:allowBackup="true"

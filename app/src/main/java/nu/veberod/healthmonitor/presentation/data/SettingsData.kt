@@ -1,7 +1,9 @@
 package nu.veberod.healthmonitor.presentation.data
 
+import android.net.Uri
+
 object SettingsData {
-    var emergencyNumber: String
+    var emergencyNumber: Uri?
         get() {
             return emergencyNumber
         }

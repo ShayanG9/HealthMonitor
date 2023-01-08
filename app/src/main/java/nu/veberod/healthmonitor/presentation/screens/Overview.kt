@@ -24,11 +24,6 @@ import nu.veberod.healthmonitor.presentation.theme.*
 @Composable
 fun Overview(navController: NavController, viewModel : ApplicationViewModel = Singleton.viewModel) {
 
-    Log.d("OVERVIEW ------------", viewModel.toString())
-    Log.d("OVERVIEW ------------", viewModel.toString())
-    Log.d("OVERVIEW ------------", viewModel.toString())
-    Log.d("OVERVIEW ------------", Singleton.toString())
-
     val sensorsState = remember {
         mutableStateOf( viewModel.sensorsState )
     }
@@ -41,7 +36,7 @@ fun Overview(navController: NavController, viewModel : ApplicationViewModel = Si
             .padding(horizontal = 30.dp, vertical = 15.dp)
     ) {
 
-        Text(text = "Overview", fontWeight = FontWeight.Bold)
+        Text(text = "Översikt", fontWeight = FontWeight.Bold)
 
         Spacer(modifier = Modifier.height(16.dp))
 

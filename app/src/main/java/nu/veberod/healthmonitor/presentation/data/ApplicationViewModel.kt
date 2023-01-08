@@ -33,7 +33,7 @@ class ApplicationViewModel() : ViewModel() {
 
     fun updateCalories(newValue: Float) {
         sensorsState.value = sensorsState.value.copy(
-            heartrate = sensorsState.value.calories,
+            heartrate = sensorsState.value.heartrate,
             steps = sensorsState.value.steps,
             calories = newValue
         )
