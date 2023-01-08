@@ -1,5 +1,4 @@
 package nu.veberod.healthmonitor.presentation
-
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
@@ -111,7 +110,6 @@ class Database{
                 .child(timestamp).setValue("Fall Detected")
 
         }
-
 
 
     }

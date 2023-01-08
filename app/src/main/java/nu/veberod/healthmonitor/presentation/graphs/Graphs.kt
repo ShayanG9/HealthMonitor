@@ -1,6 +1,8 @@
 package nu.veberod.healthmonitor.presentation.graphs
 
 import android.app.Activity
+
+import android.graphics.Insets.add
 import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,9 +27,12 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.Insets.add
 import androidx.navigation.NavController
 import androidx.navigation.compose.composable
 import nu.veberod.healthmonitor.presentation.screens.HeatMapPreview
+import java.nio.file.Files.size
+
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -66,11 +71,11 @@ fun getNum(){
     /* Hi I tried to populate the values<point> list from the sensor
     reading event (MyService.kt) and it worked on the simulator, updates values in graph
 
-    something like this in the "heart rate" reading
-    values.add(Point(values.size.toFloat(), "Whatever value heart rate is from".toFloat()))
+
+    something like this in the "heart rate" reading*/
+    valuesG.add(Point(valuesG.size.toFloat(), 0.toFloat()))
 
 
-     */
 
     //find max and min value of X, we will need that later
     minXValue = valuesG.minOf { it.x }
@@ -117,6 +122,8 @@ fun ChartWithLabels() {
         }
     }
 
+
+}
 
 }
 
@@ -172,7 +179,8 @@ fun LineChart(modifier: Modifier = Modifier
 
         })
 
-    }
+}
+
 
 
 
@@ -185,6 +193,8 @@ fun Float.mapValueToDifferentRange(
     outMin: Float,
     outMax: Float
 ) = (this - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
+
+
 
 
 

@@ -1,15 +1,20 @@
 
 package nu.veberod.healthmonitor.presentation
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+
+import android.os.Looper
+import androidx.annotation.RequiresApi
 import android.provider.Settings.Secure
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-
 import androidx.compose.foundation.background
 
 
@@ -24,6 +29,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,6 +39,7 @@ import androidx.wear.compose.material.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.VerticalPager
 import com.google.accompanist.pager.rememberPagerState
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.FirebaseApp
 import nu.veberod.healthmonitor.R
 import nu.veberod.healthmonitor.presentation.Database.Companion.readHeatMapData
@@ -52,7 +60,10 @@ class MainActivity :  ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //Permission for the sensors.
+        setPermission()
         init()
+
         setContent {
             WearApp()
         }
@@ -75,6 +86,21 @@ class MainActivity :  ComponentActivity(){
         super.onDestroy()
         updateHeatMapData()
 
+    private fun setPermission(){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION)
+            != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted, request it
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.ACTIVITY_RECOGNITION),
+                1)
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS)
+            != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted, request it
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.BODY_SENSORS),
+                1)
+
     }
 
     private fun updateHeatMapData(){
@@ -95,6 +121,7 @@ class MainActivity :  ComponentActivity(){
 
         }else{
             Database.sendHeatMap(sdf.format(Date()), 100)
+
         }
     }
 }
@@ -135,7 +162,7 @@ fun Pager(isVisible: Boolean, setVisibility: (Boolean) -> Unit){
 
     }
 
-    VerticalPager(count = 3, state= pagerState, userScrollEnabled = isVisible) { page ->
+    VerticalPager(count = 3, state= pagerState) { page ->
         // Our page content
 
 
