@@ -3,6 +3,7 @@ package nu.veberod.healthmonitor.presentation.screens
 import androidx.activity.result.contract.ActivityResultContracts
 import android.app.Activity
 import android.app.Activity.RESULT_OK
+import android.app.RemoteInput
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
@@ -27,10 +28,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import androidx.wear.compose.material.*
+import androidx.wear.input.RemoteInputIntentHelper
+import androidx.wear.input.RemoteInputIntentHelper.Companion.putRemoteInputsExtra
 import nu.veberod.healthmonitor.R
 import nu.veberod.healthmonitor.presentation.Screen
 import nu.veberod.healthmonitor.presentation.data.SettingsData
@@ -181,8 +185,14 @@ fun Settings(navController: NavController) {
 
         Button(
             onClick = {
+                val remoteInputs: List<RemoteInput> = listOf(
+                    RemoteInput.Builder("quick_reply").setLabel("Quick reply").build()
+                )
+                val intent: Intent = RemoteInputIntentHelper.createActionRemoteInputIntent()
+                putRemoteInputsExtra(intent, remoteInputs)
+                //startActivityForResult(intent, 0)
+                //val intent = Intent("com.google.android.wearable.action.LAUNCH_KEYBOARD")//"com.google.android.wearable.action.LAUNCH_KEYBOARD"
 
-                val intent = Intent("com.google.android.wearable.action.LAUNCH_KEYBOARD")
                 keyboardLauncher.launch(intent)
 
             },
@@ -265,6 +275,9 @@ fun Settings(navController: NavController) {
 fun Switch(checked: MutableState<Boolean>) {
     Switch(
         checked = checked.value,
-        onCheckedChange = { checked.value = it }
+        onCheckedChange = {
+            checked.value = it
+            SettingsData.shareHeatmapLocation = it
+        }
     )
 }
