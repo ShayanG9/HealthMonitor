@@ -10,8 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -25,9 +27,11 @@ import androidx.wear.compose.material.Text
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
+import com.google.maps.android.heatmaps.Gradient
 import com.google.maps.android.heatmaps.HeatmapTileProvider
+import com.google.maps.android.heatmaps.WeightedLatLng
 import nu.veberod.healthmonitor.R
-
+import nu.veberod.healthmonitor.presentation.Database
 
 
 @Composable
@@ -98,7 +102,8 @@ fun HeatMapPreview(navCon : NavController){
                 .fillMaxWidth()
                 .padding(top = titlePadding, bottom = 0.dp),
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.primary,
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
             text = stringResource(R.string.heatmap_title)
 
         )
@@ -126,21 +131,46 @@ fun HeatMapPreview(navCon : NavController){
             HeatMapTile()
         }
 
-        /*HeatMap(modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 0.dp))*/
-
-
-
 
     }
 
 }
+
+
 @Composable
 fun HeatMapTile(){
+    val colors = intArrayOf(
+        android.graphics.Color.argb(100, 100, 255, 255),// red
+        android.graphics.Color.rgb(0, 255, 0)  // green
 
-    val latLngs :MutableList<LatLng> = ArrayList()
-    latLngs.add(LatLng(55.634944, 13.500889))
-    val prov = HeatmapTileProvider.Builder().data(latLngs).build()
+    )
+    val startPoints = floatArrayOf(0.2f, 1f)
+
+
+
+    val prov = HeatmapTileProvider.Builder().gradient(
+        Gradient(colors, startPoints)
+    ).weightedData(getMapTileData()).maxIntensity(1.00).build()
     TileOverlay(tileProvider = prov)
+}
+
+
+fun getMapTileData( ): MutableList<WeightedLatLng> {
+    val data: List<Pair<LatLng, Int>>  = Database.readHeatMapData()
+
+    val intensity = arrayListOf<Double>()
+
+    for(i in data){
+        intensity.add(i.second.toDouble())
+    }
+
+    val max = intensity.minOrNull()
+    val min = intensity.maxOrNull()
+
+    val finalList = mutableListOf<WeightedLatLng>()
+    for(i in 0 until intensity.size){
+        intensity[i] = (intensity[i] - min!!)/(max!! - min!!)
+        finalList.add(WeightedLatLng(data[i].first, intensity[i]))
+    }
+    return finalList
 }

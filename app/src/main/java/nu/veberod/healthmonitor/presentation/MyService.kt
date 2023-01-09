@@ -9,31 +9,36 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.*
-import android.os.FileObserver.CREATE
-import androidx.compose.runtime.mutableStateOf
+
+import android.provider.ContactsContract.Data
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import nu.veberod.healthmonitor.presentation.data.Singleton
+import nu.veberod.healthmonitor.presentation.database.AppDatabase
+import nu.veberod.healthmonitor.presentation.database.LocalDatabase
+import nu.veberod.healthmonitor.presentation.graphs.Point
+import nu.veberod.healthmonitor.presentation.graphs.valuesG
+
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.random.Random
 
 class MyService : Service(){
 
     //Database
     private lateinit var appDb: AppDatabase
 
-    Sensor variables
+
+    //Sensor variables
     var emulator: Boolean = false
     private lateinit var sensorManager: SensorManager
-    private lateinit var accelerometer: Sensor;
-    private lateinit var gyroScope: Sensor
-    private lateinit var heartRate: Sensor;
-    private lateinit var stepCounter: Sensor
+    private lateinit var accelerometer: Sensor;     private lateinit var gyroScope: Sensor
+    private lateinit var heartRate: Sensor;     private lateinit var stepCounter: Sensor
     private lateinit var fallDetection: Sensor
     private lateinit var sensorName: String
     private var sensorData: MutableList<Float> = mutableListOf<Float>()
-    private val viewModel = Singleton.viewModel
+
 
     @SuppressLint("SimpleDateFormat")
     private val sdf = SimpleDateFormat("MM-dd-yyyy HH:mm:ss")
@@ -55,16 +60,18 @@ class MyService : Service(){
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-//         RESET AND CREATE DATABASE.
+
+        // RESET AND CREATE DATABASE.
+
         appDb = AppDatabase.getDatabase(this)
         GlobalScope.launch(Dispatchers.IO){
             appDb.localDatabaseDao().deleteAll()
         }
 
-//         INITIALIZE SENSORS.
+        // INITIALIZE SENSORS.
         serviceHandler?.initializeSensors()
 
-        serviceHandler?.initializeEmulatorSensors()
+        //serviceHandler?.initializeEmulatorSensors()
 
         return START_STICKY
     }
@@ -120,12 +127,15 @@ class MyService : Service(){
                     //Update the graph in Graphs.kt
                     accelerometer = sensor
                 }
+
             }
 
             sensorManager.registerListener(this, gyroScope, 5000000, serviceHandler)
             sensorManager.registerListener(this, accelerometer, 5000000, serviceHandler)
 
-            emulator = true
+
+            emulator = false
+
 
         }
 
@@ -134,6 +144,7 @@ class MyService : Service(){
             sensorManager.registerListener(this, heartRate, 5000000, serviceHandler)
             sensorManager.registerListener(this, stepCounter, 50000000, serviceHandler)
             sensorManager.registerListener(this, fallDetection, 50000000, serviceHandler)
+
 
         }
 
@@ -152,6 +163,7 @@ class MyService : Service(){
              * - Goldfish 3-axis Accelerometer
              */
 
+
             // Get the name of the current sensor.
             if (p0 != null) {
                 sensorName = p0.sensor.name
@@ -167,19 +179,27 @@ class MyService : Service(){
                     //Update the graph in Graphs.kt
                     valuesG.add(Point(valuesG.size.toFloat(), sensorData[0]))
 
-                    saveSensorData("Heart", sensorData)
+                    //saveSensorData("Heart", sensorData)
+                    Database.sendHeartRate(sdf.format(Date()), p0!!.values[0])
+
 
                 }
                 else if ("Samsung Step Counter" in sensorName)
                 {
                     sensorData.add(p0!!.values[0])
-                    saveSensorData("Step", sensorData)
+
+                    //saveSensorData("Step", sensorData)
+                    Database.sendSteps(sdf.format(Date()), p0!!.values[0].toInt())
+
                 }
                 else if ("Samsung FallDetection Sensor" in sensorName)
                 {
                     sensorData.add(p0!!.values[0])
-                    saveSensorData("Step", sensorData)
+
+                    Database.sendFall(sdf.format(Date()))
                 }
+
+
             }
             else{
                 if ("Goldfish 3-axis Accelerometer" in sensorName)
@@ -189,16 +209,17 @@ class MyService : Service(){
                     sensorData.add(p0.values[2])
                     valuesG.add(Point(valuesG.size.toFloat(), 3.0.toFloat()))
 
-                    viewModel.updateSensors(p0.values[0], p0.values[0], p0.values[0])
+                    //saveSensorData("Acc", sensorData)
 
-                    saveSensorData("Acc", sensorData)
                 }
                 else if ("Goldfish 3-axis Gyroscope" in sensorName)
                 {
                     sensorData.add(p0!!.values[0])
                     sensorData.add(p0.values[1])
                     sensorData.add(p0.values[2])
-                    saveSensorData("Gyro", sensorData)
+
+                    //saveSensorData("Gyro", sensorData)
+
                 }
             }
 
@@ -218,7 +239,9 @@ class MyService : Service(){
             writeData(name, data)
 
             /** REMOTE FIREBASE **/
-            Database.sendData(name, data, currentDate)
+
+            //Database.sendData(name, data, currentDate)
+
 
 
             //Clear the data.
