@@ -11,5 +11,6 @@ object SettingsData {
             emergencyNumber = value
         }
 
+    var chosenLocation : Uri? = null
     var shareHeatmapLocation: Boolean = false
 }
