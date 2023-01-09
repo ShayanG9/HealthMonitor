@@ -1,5 +1,6 @@
 package nu.veberod.healthmonitor.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.*
@@ -15,90 +16,39 @@ import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Text
 import nu.veberod.healthmonitor.R
 import nu.veberod.healthmonitor.presentation.Screen
+import nu.veberod.healthmonitor.presentation.data.ApplicationViewModel
+import nu.veberod.healthmonitor.presentation.data.SensorData
+import nu.veberod.healthmonitor.presentation.data.Singleton
 import nu.veberod.healthmonitor.presentation.theme.*
 
 @Composable
-fun Overview(navController: NavController) {
+fun Overview(navController: NavController, viewModel : ApplicationViewModel = Singleton.viewModel) {
 
-    var heartrate : Int = 110
-    var distance : Double = 3.5
-    var calories : Int = 349
+    val sensorsState = remember {
+        mutableStateOf( viewModel.sensorsState )
+    }
 
     Column (
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 50.dp, vertical = 20.dp)
+            .padding(horizontal = 30.dp, vertical = 15.dp)
     ) {
 
-        Text(text = "Overview", fontWeight = FontWeight.Bold)
+        Text(text = "Översikt", fontWeight = FontWeight.Bold)
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // ----------
-        // HEARTRATE
-        // ----------
+        sensorRow(value = "${sensorsState.value.value.heartrate.toInt()} bpm", icon = R.drawable.heartcircle)
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Image(
-                painterResource(id = R.drawable.heartcircle),
-                contentDescription = "",
-                modifier = Modifier.size(24.dp)
-            )
+        Spacer(modifier = Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.width(8.dp))
+        sensorRow(value = "${sensorsState.value.value.steps.toInt()} steg", icon = R.drawable.pointer)
 
-            Text(text = "$heartrate bpm", fontWeight = FontWeight.Bold)
-        }
-        
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-        // ----------
-        // SOME OTHER INFO
-        // ----------
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Image(
-                painterResource(id = R.drawable.pointer),
-                contentDescription = "",
-                modifier = Modifier.size(24.dp)
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Text(text = "$distance km", fontWeight = FontWeight.Bold)
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // ----------
-        // SOME OTHER INFO
-        // ----------
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Image(
-                painterResource(id = R.drawable.flashcircle),
-                contentDescription = "",
-                modifier = Modifier.size(24.dp)
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Text(text = "$calories kcals", fontWeight = FontWeight.Bold)
-        }
+        sensorRow(value = "${sensorsState.value.value.calories.toInt()} kcal", icon = R.drawable.flashcircle)
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -117,4 +67,24 @@ fun Overview(navController: NavController) {
             )
         }
     }
+}
+
+@Composable
+fun sensorRow(value: String, icon: Int) {
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Image(
+            painterResource(id = icon),
+            contentDescription = "",
+            modifier = Modifier.size(24.dp)
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(text = value, fontWeight = FontWeight.Bold)
+    }
+
 }
