@@ -42,7 +42,6 @@ import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.Text
 import androidx.wear.input.RemoteInputIntentHelper
 import androidx.wear.input.wearableExtender
-import androidx.wear.input.RemoteInputIntentHelper
 import nu.veberod.healthmonitor.R
 import nu.veberod.healthmonitor.presentation.Screen
 import nu.veberod.healthmonitor.presentation.data.SettingsData
