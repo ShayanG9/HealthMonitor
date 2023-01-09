@@ -1,23 +1,25 @@
 package nu.veberod.healthmonitor.presentation.screens
 
-import androidx.activity.result.contract.ActivityResultContracts
 import android.app.Activity
-import android.app.Activity.RESULT_OK
+import android.app.AlertDialog
 import android.app.RemoteInput
+import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.net.Uri
-import android.provider.Settings.*
+import android.os.Bundle
+import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -26,20 +28,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
+import androidx.core.net.toUri
 import androidx.navigation.NavController
-import androidx.wear.compose.material.*
+import androidx.wear.compose.material.Button
+import androidx.wear.compose.material.ButtonDefaults
+import androidx.wear.compose.material.Icon
+import androidx.wear.compose.material.Text
 import androidx.wear.input.RemoteInputIntentHelper
-import androidx.wear.input.RemoteInputIntentHelper.Companion.putRemoteInputsExtra
+import androidx.wear.input.wearableExtender
 import nu.veberod.healthmonitor.R
 import nu.veberod.healthmonitor.presentation.Screen
 import nu.veberod.healthmonitor.presentation.data.SettingsData
-import nu.veberod.healthmonitor.presentation.theme.*
+import nu.veberod.healthmonitor.presentation.theme.link
 import java.util.*
+
 
 @Composable
 fun Settings(navController: NavController) {
@@ -48,236 +56,193 @@ fun Settings(navController: NavController) {
     val CONTACT_PERMISSION_CODE = 0
 
     val shareLocation = remember { mutableStateOf(SettingsData.shareHeatmapLocation) }
+    val currentLocationString = remember { mutableStateOf(SettingsData.chosenLocationString) }
 
-    val contactsLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickContact()) {
-        SettingsData.emergencyNumber = it
-    }
+    val contactsLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickContact()) {
+            SettingsData.emergencyNumber = it
+        }
 
-    val keyboardLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            // Retrieve the location data from the Intent object
-            val result = result.data?.getStringExtra("result_text") ?: ""
-            val geocoder = Geocoder(mContext, Locale.getDefault())
-            var addressList = geocoder.getFromLocationName(result, 1)
+    val keyboardLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            it.data?.let { data ->
+                val results: Bundle = RemoteInput.getResultsFromIntent(data)
+                val location: CharSequence? = results.getCharSequence("address")
 
-            if (addressList?.size!! > 0) {
+                val geocoder = Geocoder(mContext, Locale.getDefault())
+                var addressList = geocoder.getFromLocationName(location.toString(), 5)
 
-                val location = addressList[0]
-                SettingsData.chosenLocation = Uri.parse("geo:${location?.latitude},${location?.longitude}")
-                Toast.makeText(mContext, "Vald plats: " + location?.locality + ", " + location?.countryCode, Toast.LENGTH_SHORT).show()
-                println(SettingsData.chosenLocation.toString())
+                // Return if no addresses were found
+                if (addressList.isNullOrEmpty() || location.isNullOrEmpty()) {
+                    Toast.makeText(mContext, "Kunde inte hitta den platsen.", Toast.LENGTH_SHORT).show()
+                    return@let
+                }
 
-            } else {
-                Toast.makeText(mContext, "Plats kunde inte hittas.", Toast.LENGTH_SHORT).show()
+                val availableAddresses = addressList.map { it.getAddressLine(0) }.filter { !it.isNullOrEmpty() }.toTypedArray()
+                val builder: AlertDialog.Builder = AlertDialog.Builder(mContext)
+                builder.setTitle("Välj din address")
+                builder.setItems(availableAddresses, DialogInterface.OnClickListener { dialog, which ->
+                    currentLocationString.value = availableAddresses[which]
+                    SettingsData.chosenLocationString = availableAddresses[which]
+                    SettingsData.chosenLocation = "geo:${addressList[which].latitude},${addressList[which].longitude}".toUri()
+                    println(SettingsData.chosenLocation.toString())
+                })
+                builder.show()
             }
         }
-    }
 
 
-    Column (
+    Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .verticalScroll(rememberScrollState())
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 20.dp)
+            .padding(horizontal = 8.dp, vertical = 20.dp)
     ) {
 
         Text(text = "Inställningar", fontWeight = FontWeight.Bold)
 
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // SETTINGS
+        Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = {
-                val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS).also {
-                    it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    it.data = Uri.parse("package:$packageName")
-                }
+        // ----------------------------
+        // OPEN APPLICATION INFORMATION
+        // ----------------------------
 
-                startActivity(mContext, intent, null)
-            },
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF363636)),
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-
+        settingsRow(
+            icon = R.drawable.infocircle,
+            label = "Information"
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.CenterStart)) {
-                Spacer(modifier = Modifier.width(16.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.infocircle),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .size(18.dp)
+            val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS).also {
+                it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                it.data = Uri.parse("package:${mContext.packageName}")
+            }
+
+            startActivity(mContext, intent, null)
+        }
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        // ----------------------------
+        // CHOOSE EMERGENCY CONTACT
+        // ----------------------------
+
+        settingsRow(
+            icon = R.drawable.contact,
+            label = "Nödkontakt"
+        ) {
+            val perm = ContextCompat.checkSelfPermission(
+                mContext,
+                android.Manifest.permission.READ_CONTACTS
+            ) == PackageManager.PERMISSION_GRANTED
+            if (perm) {
+                contactsLauncher.launch()
+            } else {
+                val permission = arrayOf(android.Manifest.permission.READ_CONTACTS)
+                ActivityCompat.requestPermissions(
+                    mContext as Activity,
+                    permission,
+                    CONTACT_PERMISSION_CODE
                 )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(text = "Information")
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
-        Button(
-            onClick = {
-                val perm = ContextCompat.checkSelfPermission(mContext, android.Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
-                if (perm) {
-                    contactsLauncher.launch()
-                }
-                else {
-                    val permission = arrayOf(android.Manifest.permission.READ_CONTACTS)
-                    ActivityCompat.requestPermissions(mContext as Activity, permission, CONTACT_PERMISSION_CODE)
-                }
-            },
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF363636)),
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.fillMaxWidth()
+        // ----------------------------
+        // CHOOSE HOME LOCATION
+        // ----------------------------
+
+        settingsRow(
+            icon = R.drawable.locationadd,
+            label = "Address",
+            value = if (currentLocationString.value != null) currentLocationString.value else "Ingen vald"
+
+
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.CenterStart)) {
-                Spacer(modifier = Modifier.width(16.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.contact),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(text = "Nödkontakt")
-            }
+            val intent: Intent = RemoteInputIntentHelper.createActionRemoteInputIntent()
+            val remoteInputs: List<RemoteInput> = listOf(
+                RemoteInput.Builder("address")
+                    .setLabel("Hur vill du ange din address?")
+                    .wearableExtender {
+                        setEmojisAllowed(false)
+                        setInputActionType(EditorInfo.IME_ACTION_DONE)
+                    }.build()
+            )
+
+            RemoteInputIntentHelper.putRemoteInputsExtra(intent, remoteInputs)
+
+            keyboardLauncher.launch(intent)
         }
 
-// REDUNDANT SINCE WE HAVE "INFORMATION" WHERE ALL PERMISSIONS ARE LOCATED
-//        Spacer(modifier = Modifier.height(8.dp))
-//
-//        Button(
-//            onClick = {
-//                val permission = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-//                ActivityCompat.requestPermissions(mContext as Activity, permission, LOCATION_PERMISSION_CODE)
-//            },
-//            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF363636)),
-//            shape = RoundedCornerShape(8.dp),
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//            Row(verticalAlignment = Alignment.CenterVertically,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .align(Alignment.CenterStart)) {
-//                Spacer(modifier = Modifier.width(16.dp))
-//                Icon(
-//                    painter = painterResource(id = R.drawable.locationslash),
-//                    contentDescription = "",
-//                    modifier = Modifier
-//                        .size(18.dp)
-//                )
-//                Spacer(modifier = Modifier.width(16.dp))
-//                Text(text = "Sekretess")
-//            }
-//        }
+        Spacer(modifier = Modifier.height(6.dp))
 
-        Spacer(modifier = Modifier.height(8.dp))
+        // ----------------------------
+        // TOGGLE LOCATION SHARE
+        // ----------------------------
 
-        Button(
-            onClick = {
-                val remoteInputs: List<RemoteInput> = listOf(
-                    RemoteInput.Builder("quick_reply").setLabel("Quick reply").build()
-                )
-                val intent: Intent = RemoteInputIntentHelper.createActionRemoteInputIntent()
-                putRemoteInputsExtra(intent, remoteInputs)
-                //startActivityForResult(intent, 0)
-                //val intent = Intent("com.google.android.wearable.action.LAUNCH_KEYBOARD")//"com.google.android.wearable.action.LAUNCH_KEYBOARD"
-
-                keyboardLauncher.launch(intent)
-
-            },
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF363636)),
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.fillMaxWidth()
+        settingsRow(
+            icon = if (shareLocation.value) R.drawable.location else R.drawable.locationslash,
+            label = "Platsdelning",
+            value = if (shareLocation.value) "Delar" else "Delar inte"
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.CenterStart)) {
-                Spacer(modifier = Modifier.width(16.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.locationadd),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(text = "Mitt Hem")
-            }
+
+            shareLocation.value = !shareLocation.value
+            SettingsData.shareHeatmapLocation = shareLocation.value
+
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
-        Button(
-            onClick = {
+        // ----------------------------
+        // GO BACK
+        // ----------------------------
 
-                shareLocation.value = !shareLocation.value
-                SettingsData.shareHeatmapLocation = shareLocation.value
-
-            },
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF363636)),
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.fillMaxWidth()
+        settingsRow(
+            icon = R.drawable.closecircle_light,
+            label = "Tillbaka"
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.CenterStart)) {
-                Spacer(modifier = Modifier.width(16.dp))
-                Switch(shareLocation)
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(text = "Dela Plats")
-            }
+
+            navController.navigate(Screen.Overview.route)
+
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
-        Button(
-            onClick = {
-                navController.navigate(Screen.Overview.route)
-            },
-            colors = ButtonDefaults.buttonColors(backgroundColor = accent_dark),
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.CenterStart)) {
-                Spacer(modifier = Modifier.width(16.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.closecircle_light),
-                    tint = Color.White,
-                    contentDescription = "",
-                    modifier = Modifier
-                        .size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text("Tillbaka", color = Color.White)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(50.dp))
     }
 }
 
 @Composable
-fun Switch(checked: MutableState<Boolean>) {
-    Switch(
-        checked = checked.value,
-        onCheckedChange = {
-            checked.value = it
-            SettingsData.shareHeatmapLocation = it
+
+fun settingsRow(icon : Int, label : String, value : String? = null, onClick : () -> Unit) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray),
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(15.dp, 5.dp)
+                .align(Alignment.CenterStart)
+        ) {
+            Icon(painter = painterResource(id = icon), contentDescription = "", Modifier.size(20.dp))
+            Spacer(modifier = Modifier.width(10.dp))
+            Column {
+                Text(text = label)
+                if (value != null) Text(text = value, color = link, fontWeight = FontWeight.Medium, overflow = TextOverflow.Ellipsis, maxLines = 1)
+            }
         }
-    )
+    }
+}
+
+private fun showSettings(mContext : Context) {
+    val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS).also {
+        it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        it.data = Uri.parse("package:${mContext.packageName}")
+    }
+
+    startActivity(mContext, intent, null)
+
 }
