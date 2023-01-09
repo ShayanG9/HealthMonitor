@@ -3,8 +3,8 @@ package nu.veberod.healthmonitor.presentation.settings
 import android.app.Activity
 import android.content.Context
 
-class Settings {
-    fun writeSetting(a: Activity, key: String, value: Int){
+class SettingsSave {
+    companion object{fun writeLocation(a: Activity, key: String, value: Int){
         val pref = a?.getPreferences(Context.MODE_PRIVATE)
         with(pref.edit()){
             putInt(key, value)
@@ -13,8 +13,10 @@ class Settings {
 
     }
 
-    fun readSetting(a: Activity, key:String): Int{
-        val pref = a?.getPreferences(Context.MODE_PRIVATE)
-        return pref.getInt(key, -1)
+        fun readSetting(a: Activity, key:String): Int{
+            val pref = a?.getPreferences(Context.MODE_PRIVATE)
+            return pref.getInt(key, -1)
+        }
     }
+
 }
