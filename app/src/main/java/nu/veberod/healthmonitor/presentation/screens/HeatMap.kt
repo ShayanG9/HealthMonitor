@@ -39,7 +39,7 @@ fun HeatMap(navCon: NavController){
     Box{
         val veberod = LatLng(55.634944, 13.500889)
         val cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(veberod, 11.8f)
+            position = CameraPosition.fromLatLngZoom(veberod, 12f)
         }
 
         GoogleMap(
@@ -110,7 +110,7 @@ fun HeatMapPreview(navCon : NavController){
 
         val veberod = LatLng(55.634944, 13.500889)
         val cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(veberod, 11.8f)
+            position = CameraPosition.fromLatLngZoom(veberod, 12f)
         }
 
 
@@ -140,15 +140,15 @@ fun HeatMapPreview(navCon : NavController){
 @Composable
 fun HeatMapTile(){
     val colors = intArrayOf(
-        android.graphics.Color.argb(100, 100, 255, 255),// red
-        android.graphics.Color.rgb(0, 255, 0)  // green
+        android.graphics.Color.argb(100, 100, 100, 255),// red
+        android.graphics.Color.rgb(0, 200, 0)  // green
 
     )
     val startPoints = floatArrayOf(0.2f, 1f)
 
 
 
-    val prov = HeatmapTileProvider.Builder().gradient(
+   val prov = HeatmapTileProvider.Builder().gradient(
         Gradient(colors, startPoints)
     ).weightedData(getMapTileData()).maxIntensity(1.00).build()
     TileOverlay(tileProvider = prov)
@@ -170,7 +170,10 @@ fun getMapTileData( ): MutableList<WeightedLatLng> {
     val finalList = mutableListOf<WeightedLatLng>()
     for(i in 0 until intensity.size){
         intensity[i] = (intensity[i] - min!!)/(max!! - min!!)
+
         finalList.add(WeightedLatLng(data[i].first, intensity[i]))
     }
+
+
     return finalList
 }
