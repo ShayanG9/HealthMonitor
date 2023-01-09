@@ -150,11 +150,10 @@ class MyService : Service(){
 
         fun registerListener(){
             // Register the SensorEventListener to receive updates from the sensors
-            //sensorManager.registerListener(this, heartRate, 5000000, serviceHandler)
-            //sensorManager.registerListener(this, stepCounter, 50000000, serviceHandler)
-
-            //sensorManager.registerListener(this, fallDetection, 50000000, serviceHandler)
-           // sensorManager.registerListener(this, calorieCounter, 50000000, serviceHandler)
+            sensorManager.registerListener(this, heartRate, 5000000, serviceHandler)
+            sensorManager.registerListener(this, stepCounter, 50000000, serviceHandler)
+            sensorManager.registerListener(this, fallDetection, 50000000, serviceHandler)
+            sensorManager.registerListener(this, calorieCounter, 50000000, serviceHandler)
 
 
         }
@@ -189,12 +188,12 @@ class MyService : Service(){
                     sensorData.add(p0!!.values[0])
                     println(sensorData[0])
 
-                    //Update the graph in Graphs.kt
-                    valuesG.add(Point(valuesG.size.toFloat(), sensorData[0]))
+
 
                     saveSensorData("Heart", sensorData)
                     Database.sendHeartRate(sdf.format(Date()), p0!!.values[0])
 
+                    //Update the graph in Graphs.kt
                     Singleton.viewModel.viewModelScope.launch {
                         Singleton.viewModel.updateHeartrate(p0!!.values[0])
                         Singleton.viewModel.updatePoints(p0!!.values[0])

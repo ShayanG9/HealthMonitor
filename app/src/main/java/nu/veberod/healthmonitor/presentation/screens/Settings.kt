@@ -1,5 +1,6 @@
 package nu.veberod.healthmonitor.presentation.screens
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.RemoteInput
@@ -7,10 +8,13 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.location.Geocoder
 import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -31,7 +35,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.net.toUri
@@ -42,17 +45,21 @@ import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.Text
 import androidx.wear.input.RemoteInputIntentHelper
 import androidx.wear.input.wearableExtender
+import com.google.android.gms.maps.model.LatLng
 import nu.veberod.healthmonitor.R
 import nu.veberod.healthmonitor.presentation.Screen
 import nu.veberod.healthmonitor.presentation.data.SettingsData
+import nu.veberod.healthmonitor.presentation.settings.SettingsSave
 import nu.veberod.healthmonitor.presentation.theme.link
 import java.util.*
 
 
+@SuppressLint("Range")
 @Composable
 fun Settings(navController: NavController) {
     val mContext = LocalContext.current
     val packageName = mContext.packageName
+
     val CONTACT_PERMISSION_CODE = 0
 
     val shareLocation = remember { mutableStateOf(SettingsData.shareHeatmapLocation) }
@@ -61,6 +68,25 @@ fun Settings(navController: NavController) {
     val contactsLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.PickContact()) {
             SettingsData.emergencyNumber = it
+
+            val c = mContext.contentResolver.query(it!!, null, null,null)
+            if (c!!.moveToFirst()) {
+                val id: String =
+                    c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
+                val hasPhone: String =
+                    c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))
+                if (hasPhone.equals("1", ignoreCase = true)) {
+                    val phones = mContext.contentResolver.query(
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + id, null, null
+                    )
+                    phones!!.moveToFirst()
+                    val contactNumber: String =
+                        phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                    SettingsSave.writePhoneNumber(mContext as Activity, contactNumber)
+
+                }
+            }
         }
 
     val keyboardLauncher =
@@ -85,6 +111,8 @@ fun Settings(navController: NavController) {
                     currentLocationString.value = availableAddresses[which]
                     SettingsData.chosenLocationString = availableAddresses[which]
                     SettingsData.chosenLocation = "geo:${addressList[which].latitude},${addressList[which].longitude}".toUri()
+                    SettingsSave.writeLatLng(mContext as Activity, LatLng(addressList[which].latitude, addressList[which].longitude))
+                    SettingsSave.writeLocationString(mContext , availableAddresses[which])
                     println(SettingsData.chosenLocation.toString())
                 })
                 builder.show()
@@ -156,7 +184,7 @@ fun Settings(navController: NavController) {
         settingsRow(
             icon = R.drawable.locationadd,
             label = "Address",
-            value = if (currentLocationString.value != null) currentLocationString.value else "Ingen vald"
+            value = if (currentLocationString.value != null) currentLocationString.value else SettingsSave.readLocationString(mContext as Activity)
 
 
         ) {
@@ -180,14 +208,14 @@ fun Settings(navController: NavController) {
         // ----------------------------
         // TOGGLE LOCATION SHARE
         // ----------------------------
-
+        shareLocation.value = SettingsSave.readLocationShare(mContext as Activity)
         settingsRow(
             icon = if (shareLocation.value) R.drawable.location else R.drawable.locationslash,
             label = "Platsdelning",
             value = if (shareLocation.value) "Delar" else "Delar inte"
         ) {
-
-            shareLocation.value = !shareLocation.value
+            SettingsSave.writeLocationShare(mContext as Activity,!shareLocation.value )
+            shareLocation.value =  !shareLocation.value
             SettingsData.shareHeatmapLocation = shareLocation.value
 
         }

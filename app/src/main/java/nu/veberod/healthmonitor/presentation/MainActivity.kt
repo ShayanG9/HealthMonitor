@@ -26,10 +26,12 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.VerticalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.FirebaseApp
+import nu.veberod.healthmonitor.presentation.data.SettingsData
 import nu.veberod.healthmonitor.presentation.data.Singleton
 import nu.veberod.healthmonitor.presentation.screens.HeatMapTab
 import nu.veberod.healthmonitor.presentation.graphs.ChartWithLabels
 import nu.veberod.healthmonitor.presentation.screens.Fall
+import nu.veberod.healthmonitor.presentation.settings.SettingsSave
 import nu.veberod.healthmonitor.presentation.theme.HealthMonitorTheme
 import java.text.SimpleDateFormat
 import java.util.*
@@ -69,7 +71,9 @@ class MainActivity :  ComponentActivity(){
 
     override fun onDestroy() {
         super.onDestroy()
-        updateHeatMapData()
+        if(SettingsSave.readLocationShare(this)) {
+            updateHeatMapData()
+        }
     }
 
     private fun setPermission() {
@@ -111,14 +115,14 @@ class MainActivity :  ComponentActivity(){
             if( elapsedTime >  24){
                 //Use below if emulating
                 //Database.sendHeatMap(sdf.format(currentDate), 100)
-                Database.sendHeatMap(sdf.format(Date()), Singleton.viewModel.sensorsState.value.steps)
+                Database.sendHeatMap(sdf.format(Date()), Singleton.viewModel.sensorsState.value.steps, this)
             }
 
         }else{
             //Use below if emulating
             //Database.sendHeatMap(sdf.format(Date()), 100)
 
-            Database.sendHeatMap(sdf.format(Date()), kotlin.random.Random.nextInt(0,100).toFloat())
+            Database.sendHeatMap(sdf.format(Date()), kotlin.random.Random.nextInt(0,100).toFloat(), this)
 
 
 

@@ -1,24 +1,26 @@
 package nu.veberod.healthmonitor.presentation
+import android.app.Activity
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.FirebaseDatabase
+import nu.veberod.healthmonitor.presentation.settings.SettingsSave
 import kotlin.random.Random
 
 
 class Database{
     companion object {
 
-        fun sendHeatMap(timestamp: String, data: Float){
+        fun sendHeatMap(timestamp: String, data: Float, a: Activity){
             val database = FirebaseDatabase.getInstance().reference
             val data_user = database.child("heatmap")
                 .child("user")
                 .child(androidID!!)
 
             data_user.child("timestamp").setValue(timestamp)
-            data_user.child("location").setValue(LatLng(55.634944+ Random.nextDouble(-0.01, 0.01 ), 13.500889+ Random.nextDouble(-0.01, 0.01 ) ))
+            data_user.child("location").setValue(SettingsSave.readLatLng(a))
             data_user.child("steps").setValue(data)
 
         }
