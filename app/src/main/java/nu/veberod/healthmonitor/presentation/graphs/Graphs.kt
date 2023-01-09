@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.Insets.add
 import androidx.navigation.NavController
 import androidx.navigation.compose.composable
+import nu.veberod.healthmonitor.presentation.data.Singleton
 import nu.veberod.healthmonitor.presentation.screens.HeatMapPreview
 import java.nio.file.Files.size
 
@@ -73,16 +74,21 @@ fun getNum(){
 
 
     something like this in the "heart rate" reading*/
-    valuesG.add(Point(valuesG.size.toFloat(), 0.toFloat()))
+
+
+
+    //valuesG.add(Point(valuesG.size.toFloat(), 0.toFloat()))
+
+    val v = Singleton.viewModel.sensorsState.value.points
 
 
 
     //find max and min value of X, we will need that later
-    minXValue = valuesG.minOf { it.x }
-    maxXValue = valuesG.maxOf { it.x }
+    minXValue = v.minOf { it.x }
+    maxXValue = v.maxOf { it.x }
     // find max and min value of Y, we will need that later
-    minYValue = valuesG.minOf { it.y }
-    maxYValue = valuesG.maxOf { it.y }
+    minYValue = v.minOf { it.y }
+    maxYValue = v.maxOf { it.y }
 
 }
 
@@ -139,7 +145,7 @@ fun LineChart(modifier: Modifier = Modifier
         .drawBehind { // we use drawBehind() method to create canvas
 
             // map data points to pixel values, in canvas we think in pixels
-            val pixelPoints = valuesG.map {
+            val pixelPoints = Singleton.viewModel.sensorsState.value.points.map {
                 // we use extension function to convert and scale initial values to pixels
                 val x = it.x.mapValueToDifferentRange(
                     inMin = minXValue,

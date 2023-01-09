@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.net.toUri
@@ -41,6 +42,7 @@ import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.Text
 import androidx.wear.input.RemoteInputIntentHelper
 import androidx.wear.input.wearableExtender
+import androidx.wear.input.RemoteInputIntentHelper
 import nu.veberod.healthmonitor.R
 import nu.veberod.healthmonitor.presentation.Screen
 import nu.veberod.healthmonitor.presentation.data.SettingsData
@@ -156,6 +158,8 @@ fun Settings(navController: NavController) {
             icon = R.drawable.locationadd,
             label = "Address",
             value = if (currentLocationString.value != null) currentLocationString.value else "Ingen vald"
+
+
         ) {
             val intent: Intent = RemoteInputIntentHelper.createActionRemoteInputIntent()
             val remoteInputs: List<RemoteInput> = listOf(
@@ -210,6 +214,7 @@ fun Settings(navController: NavController) {
 }
 
 @Composable
+
 fun settingsRow(icon : Int, label : String, value : String? = null, onClick : () -> Unit) {
     Button(
         onClick = onClick,
@@ -240,4 +245,5 @@ private fun showSettings(mContext : Context) {
     }
 
     startActivity(mContext, intent, null)
+
 }
