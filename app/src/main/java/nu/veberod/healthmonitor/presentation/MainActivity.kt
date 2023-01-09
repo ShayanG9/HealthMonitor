@@ -117,7 +117,10 @@ class MainActivity :  ComponentActivity(){
         }else{
             //Use below if emulating
             //Database.sendHeatMap(sdf.format(Date()), 100)
-            Database.sendHeatMap(sdf.format(Date()), Singleton.viewModel.sensorsState.value.steps)
+
+            Database.sendHeatMap(sdf.format(Date()), kotlin.random.Random.nextInt(0,100).toFloat())
+
+
 
         }
     }
@@ -167,7 +170,7 @@ fun Pager(isVisible: Boolean, setVisibility: (Boolean) -> Unit){
     CompositionLocalProvider(
         LocalOverscrollConfiguration provides null
     ) {
-        VerticalPager(count = 3, state= pagerState) { page ->
+        VerticalPager(count = 3, state= pagerState, userScrollEnabled = isVisible) { page ->
             // Our page content
 
 
