@@ -2,6 +2,7 @@ package nu.veberod.healthmonitor.presentation.screens
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -10,7 +11,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Text
@@ -48,10 +51,6 @@ fun Overview(navController: NavController, viewModel : ApplicationViewModel = Si
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        sensorRow(value = "${sensorsState.value.value.calories.toInt()} kcal", icon = R.drawable.flashcircle)
-
-        Spacer(modifier = Modifier.height(8.dp))
-
         Button(
             onClick = {
                 navController.navigate(Screen.Settings.route)
@@ -63,7 +62,7 @@ fun Overview(navController: NavController, viewModel : ApplicationViewModel = Si
             Image(
                 painterResource(id = R.drawable.settings),
                 contentDescription = "",
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(28.dp)
             )
         }
     }
@@ -74,17 +73,17 @@ fun sensorRow(value: String, icon: Int) {
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(.95f)
     ) {
         Image(
             painterResource(id = icon),
             contentDescription = "",
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(26.dp)
         )
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        Text(text = value, fontWeight = FontWeight.Bold)
+        Text(text = value, fontWeight = FontWeight.Bold, fontSize = 17.sp)
     }
 
 }
