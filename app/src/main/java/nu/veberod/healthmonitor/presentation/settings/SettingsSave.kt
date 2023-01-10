@@ -62,15 +62,15 @@ class SettingsSave {
         fun writeLatLng(a: Activity, latLng: LatLng){
             val pref = a?.getPreferences(Context.MODE_PRIVATE)
             with(pref.edit()){
-                putLong("lat", latLng.latitude.toLong())
-                putLong("lng", latLng.longitude.toLong())
+                putFloat("lat",  latLng.latitude.toFloat())
+                putFloat("lng", latLng.longitude.toFloat())
                 apply()
             }
         }
 
         fun readLatLng(a: Activity): LatLng{
             val pref = a?.getPreferences(Context.MODE_PRIVATE)
-            return LatLng(pref.getLong("lat",0).toDouble(), pref.getLong("lng",0).toDouble())
+            return LatLng(pref.getFloat("lat",0.0f).toDouble(), pref.getFloat("lng",0.0f).toDouble())
         }
 
     }
