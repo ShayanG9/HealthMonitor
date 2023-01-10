@@ -249,7 +249,7 @@ class MyService : Service(){
             val norm = sqrt(pow(ax.toDouble(), 2.0) + pow(ay.toDouble() ,2.0) + pow(az.toDouble() ,2.0))
 
             valuesG.add(Point(valuesG.size.toFloat(), 3.0.toFloat()))
-            if( norm > 25.0){
+            if( norm > 28.0){
                 Log.i("fall", norm.toString())
                 Singleton.viewModel.viewModelScope.launch {
                     Singleton.viewModel.updateFall(true)

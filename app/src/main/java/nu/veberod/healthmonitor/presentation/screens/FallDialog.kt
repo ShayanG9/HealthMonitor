@@ -1,7 +1,14 @@
 package nu.veberod.healthmonitor.presentation.screens
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.os.Build
 import android.os.CountDownTimer
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.getSystemService
 import androidx.lifecycle.viewModelScope
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipDefaults
@@ -24,6 +32,7 @@ import nu.veberod.healthmonitor.presentation.fall.sendSMS
 //import nu.veberod.healthmonitor.presentation.func
 
 
+@SuppressLint("MissingPermission")
 @Composable
 fun Fall(){
 
@@ -31,16 +40,26 @@ fun Fall(){
 
     val context = LocalContext.current
 
+    val v = context.getSystemService(Vibrator::class.java)
+
+
+
     val a = object : CountDownTimer(20000, 1000) {
 
+        @SuppressLint("MissingPermission")
+        @RequiresApi(Build.VERSION_CODES.S)
         override fun onTick(millisUntilFinished: Long) {
+            v.vibrate(VibrationEffect.createOneShot(400, VibrationEffect.DEFAULT_AMPLITUDE))
             counter =  (millisUntilFinished / 1000).toString()
         }
 
         override fun onFinish() {
-            //sendSMS(context, "test", "+460793182737")
+            sendSMS(context, "test", "+460793182737")
+            Singleton.viewModel.updateFall(false)
         }
     }.start()
+
+
 
 
     Alert(
