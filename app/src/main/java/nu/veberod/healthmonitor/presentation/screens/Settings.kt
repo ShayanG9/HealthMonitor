@@ -183,7 +183,7 @@ fun Settings(navController: NavController) {
 
         settingsRow(
             icon = R.drawable.locationadd,
-            label = "Address",
+            label = "Adress",
             value = if (currentLocationString.value != null) currentLocationString.value else SettingsSave.readLocationString(mContext as Activity)
 
 

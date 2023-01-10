@@ -1,3 +1,14 @@
+/*
+*
+*
+* Authors: Shayan Ghaffari, Filip, David, Nils
+* Github:  https://github.com/ShayanG9/HealthMonitor/
+*
+*
+*
+*
+*
+ */
 
 package nu.veberod.healthmonitor.presentation
 
@@ -26,6 +37,7 @@ import androidx.wear.compose.material.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.VerticalPager
 import com.google.accompanist.pager.rememberPagerState
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.FirebaseApp
 import nu.veberod.healthmonitor.presentation.data.SettingsData
 import nu.veberod.healthmonitor.presentation.data.Singleton
@@ -73,7 +85,8 @@ class MainActivity :  ComponentActivity(){
 
     override fun onDestroy() {
         super.onDestroy()
-        if(SettingsSave.readLocationShare(this)) {
+        if(SettingsSave.readLocationShare(this) && SettingsSave.readLatLng(this) != LatLng(0.0, 0.0)) {
+            Log.i("heat", "y")
             updateHeatMapData()
         }
     }
@@ -111,10 +124,10 @@ class MainActivity :  ComponentActivity(){
             var savedDate: Date = sdf.parse(data.result.value as String)
             val currentDate = Date()
 
-            val elapsedTime = (currentDate.time - savedDate.time )/(1000*3600)
+                val elapsedTime = (currentDate.time - savedDate.time )/(1000*3600)
             Log.i("test", elapsedTime.toString())
 
-            if( elapsedTime >  24){
+            if( elapsedTime >=  24){
                 //Use below if emulating
                 //Database.sendHeatMap(sdf.format(currentDate), 100)
                 Database.sendHeatMap(sdf.format(Date()), Singleton.viewModel.sensorsState.value.steps, this)
@@ -124,7 +137,7 @@ class MainActivity :  ComponentActivity(){
             //Use below if emulating
             //Database.sendHeatMap(sdf.format(Date()), 100)
 
-            Database.sendHeatMap(sdf.format(Date()), kotlin.random.Random.nextInt(0,100).toFloat(), this)
+            Database.sendHeatMap(sdf.format(Date()), Singleton.viewModel.sensorsState.value.steps, this)
 
 
 
