@@ -1,7 +1,7 @@
 /*
 *
 *
-* Authors: Shayan Ghaffari, Filip, David, Nils
+* Authors: Shayan Ghaffari, Filip Rörstam, David Saarikari, Nils Mårtensson
 * Github:  https://github.com/ShayanG9/HealthMonitor/
 *
 *
